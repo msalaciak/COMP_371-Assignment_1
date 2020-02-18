@@ -31,6 +31,7 @@ int main(int argc, char*argv[])
     mat4 translateOlaf(1.f);
     mat4 scaleOlaf(1.f);
     srand (time(NULL));
+    int primativeRender = GL_TRIANGLES;
     // Initialize GLFW and OpenGL version
     glfwInit();
  
@@ -239,37 +240,34 @@ int main(int argc, char*argv[])
             mat4 olaf_Body = camera_ModelViewProjection_Olaf * translate(mat4(1.0f), vec3(0.f, 3.5f, 0.f))* scale(mat4(1.0f), vec3(2.f, 2.f, 2.0f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            
+            glDrawArrays(primativeRender, 0, 36);
             
             //upper body
             olaf_Body = camera_ModelViewProjection_Olaf * translate(mat4(1.0f), vec3(0.f, 4.55f, 0.f)) * scale(mat4(1.0f), vec3(-1.5f, -1.3f, -1.6f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glDrawArrays(primativeRender, 0, 36);
             
             //head
             olaf_Body = camera_ModelViewProjection_Olaf * translate(mat4(1.0f), vec3(0.f, 5.55f, 0.f)) * scale(mat4(1.0f), vec3(-0.7f, -0.7f, -1.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glDrawArrays(primativeRender, 0, 36);
             
             //left right
             olaf_Body = camera_ModelViewProjection_Olaf * translate(mat4(1.0f), vec3(-0.0f, 1.3f, -0.5f)) * scale(mat4(1.0f), vec3(1.0f, 2.2f, -0.4f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glDrawArrays(primativeRender, 0, 36);
             
             //left leg
             olaf_Body = camera_ModelViewProjection_Olaf * translate(mat4(1.0f), vec3(-0.0f, 1.3f, 0.5f)) * scale(mat4(1.0f), vec3(1.0f, 2.2f, -0.4f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glDrawArrays(primativeRender, 0, 36);
             
-            olaf_Body =  olaf_Body * translate(mat4(1.0f), vec3(-0.0f, 10.3f, 0.5f));
-            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-            glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
-//            glDrawArrays(GL_TRIANGLES, 0, 36);
-            
+           
           
             
             
@@ -381,6 +379,33 @@ int main(int argc, char*argv[])
                                        z-=0.01;
                                        scaleOlaf = scaleOlaf  * scale(mat4(1.0f), vec3(x, y, z));
                                    }
+            
+            
+            if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) // scale down
+                                   {
+                                       
+                                       primativeRender = GL_TRIANGLES;
+                                   }
+            
+            if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) // scale down
+                                             {
+                                                 
+                                                 primativeRender = GL_POINTS;
+                                             }
+            
+            if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) // scale down
+            {
+                
+                primativeRender = GL_LINES;
+            }
+            //0 is for points
+            //3 is for lines
+            //
+            
+            
+            
+            
+            
             viewMatrix = lookAt(cameraPosition, cameraPosition + cameraLookAt, cameraUp );
             
          
