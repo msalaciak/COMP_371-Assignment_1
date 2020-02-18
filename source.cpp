@@ -3,8 +3,7 @@
 //
 // Created by Matthew Salaciak 29644490.
 //
-// Inspired by the COMP 371 Labs and the following tutorials:
-// - https://learnopengl.com/Getting-started/Hello-Window
+// Inspired by the COMP 371 Lab 2,3 and 4 and the following tutorials:
 // - https://learnopengl.com/Getting-started/Hello-Triangle
 // - https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL (for shader class)
 
@@ -122,7 +121,7 @@ int main(int argc, char*argv[])
  
     
     // Set projection matrix for shader, this won't change
-                  mat4 projectionMatrix = glm::mat4(1.0f);
+                  mat4 projectionMatrix = mat4(1.0f);
                   projectionMatrix = perspective(20.0f,1024.0f / 768.0f, 0.01f, 100.0f);
 
                   mat4 viewMatrix = lookAt(cameraPosition,  // eye
@@ -130,7 +129,7 @@ int main(int argc, char*argv[])
                                            cameraUp ); // up
                  mat4 modelMatrix = mat4(1.0f);
 
-              glm::mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
+                 mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
     
     // For frame time
     float lastFrameTime = glfwGetTime();
@@ -311,9 +310,9 @@ int main(int argc, char*argv[])
                        float phi = radians(cameraVerticalAngle);
                        
                        cameraLookAt = vec3(cosf(phi)*cosf(theta), sinf(phi), -cosf(phi)*sinf(theta));
-                       vec3 cameraSideVector = glm::cross(cameraLookAt, vec3(0.0f, 1.0f, 0.0f));
+                       vec3 cameraSideVector = cross(cameraLookAt, vec3(0.0f, 1.0f, 0.0f));
                        
-                       glm::normalize(cameraSideVector);
+                       normalize(cameraSideVector);
 
             
       if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // move camera to the left
