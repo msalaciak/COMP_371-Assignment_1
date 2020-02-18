@@ -348,7 +348,7 @@ int main(int argc, char*argv[])
                    cameraPosition.z += currentCameraSpeed * dt*40;
                }
             
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) // move camera down
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) // random position
                  {
                      
                      float xTrans = rand() % 7 + (-3);
@@ -356,7 +356,7 @@ int main(int argc, char*argv[])
                      translateOlaf = translateOlaf * translate(mat4(1.0f), vec3(xTrans, 0.0f, zTrans));
                  }
             
-            if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) // move camera down
+            if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) // scale up
                           {
                               
                               float x =1;
@@ -370,7 +370,7 @@ int main(int argc, char*argv[])
 
             
             
-            if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) // move camera down
+            if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) // scale down
                                    {
                                        
                                        float x =1;
