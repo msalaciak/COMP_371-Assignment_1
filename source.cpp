@@ -19,6 +19,7 @@
 #include <glm/common.hpp>
 #include "vertices.h"
 #include "Shader.h"
+#include <time.h>
 
 using namespace glm;
 using namespace std;
@@ -27,6 +28,9 @@ using namespace std;
 
 int main(int argc, char*argv[])
 {
+    mat4 translateOlaf(1.f);
+    mat4 scaleOlaf(1.f);
+    srand (time(NULL));
     // Initialize GLFW and OpenGL version
     glfwInit();
  
@@ -226,13 +230,13 @@ int main(int argc, char*argv[])
             glBindVertexArray(vertexArrayObjects[2]);
             glUseProgram(olaf_Shader);
             
-            mat4 camera_ModelViewProjection_Olaf =  projectionMatrix * viewMatrix;
+            mat4 camera_ModelViewProjection_Olaf =  projectionMatrix * viewMatrix * translateOlaf * scaleOlaf;
             
             GLuint modelViewProjection_Olaf = glGetUniformLocation(olaf_Shader, "mvp");
             GLuint olaf_Color = glGetUniformLocation(olaf_Shader, "olaf_color");
             
             //body
-            mat4 olaf_Body = camera_ModelViewProjection_Olaf * scale(mat4(1.0f), vec3(2.f, 2.f, 2.0f)) * translate(mat4(1.0f), vec3(0.f, 01.5f, 0.f));
+            mat4 olaf_Body = camera_ModelViewProjection_Olaf * translate(mat4(1.0f), vec3(0.f, 3.5f, 0.f))* scale(mat4(1.0f), vec3(2.f, 2.f, 2.0f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
             glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -334,7 +338,7 @@ int main(int argc, char*argv[])
           cameraPosition.y += currentCameraSpeed * dt*40;
       }
             
-            if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) // move camera up
+      if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) // move camera up
                {
                    cameraPosition.z -= currentCameraSpeed * dt*40;
                }
@@ -343,7 +347,40 @@ int main(int argc, char*argv[])
                {
                    cameraPosition.z += currentCameraSpeed * dt*40;
                }
+            
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) // move camera down
+                 {
+                     
+                     float xTrans = rand() % 7 + (-3);
+                     float  zTrans = rand() % 7 + (-3);
+                     translateOlaf = translateOlaf * translate(mat4(1.0f), vec3(xTrans, 0.0f, zTrans));
+                 }
+            
+            if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) // move camera down
+                          {
+                              
+                              float x =1;
+                              float y=1;
+                              float z=1;
+                              x+=0.01;
+                              y+=0.01;
+                              z+=0.01;
+                              scaleOlaf = scaleOlaf  * scale(mat4(1.0f), vec3(x, y, z));
+                          }
 
+            
+            
+            if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) // move camera down
+                                   {
+                                       
+                                       float x =1;
+                                       float y=1;
+                                       float z=1;
+                                       x-=0.01;
+                                       y-=0.01;
+                                       z-=0.01;
+                                       scaleOlaf = scaleOlaf  * scale(mat4(1.0f), vec3(x, y, z));
+                                   }
             viewMatrix = lookAt(cameraPosition, cameraPosition + cameraLookAt, cameraUp );
             
          
