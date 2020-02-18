@@ -6,12 +6,12 @@ in vec3 vertexColor;
 // Output data
 out vec3 color;
 
-uniform vec3 axis_color;
+uniform vec3 xyz_color;
 
 uniform vec4 color_x;
 uniform vec4 color_y;
 uniform vec4 color_z;
 
 void main(){
-    color = axis_color;
+    color = xyz_color;
 }

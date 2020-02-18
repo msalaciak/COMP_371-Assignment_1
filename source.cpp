@@ -176,20 +176,15 @@ int main(int argc, char*argv[])
          
             GLuint modelViewProjection_XZ_GRID = glGetUniformLocation(XZ_grid_shader, "mvp");
        
-      
-        
-
-            
-      
-
+    
             for(int i=1; i<=50; ++i)
                    {
                     
                        for(int j=1; j<=50; ++j)
                        {
                            mat4 x1 = MVP * translate(mat4(1.0f), vec3(i-1, 0.f, 0.f));
-                           mat4 x2 = MVP * glm::translate(mat4(1.0f), vec3(-i, 0.f, 0.f));
-                           mat4 z1 = translate(glm::mat4(1.0f), vec3(0.f, 0.f, j-1));
+                           mat4 x2 = MVP * translate(mat4(1.0f), vec3(-i, 0.f, 0.f));
+                           mat4 z1 = translate(mat4(1.0f), vec3(0.f, 0.f, j-1));
                            mat4 z2 = translate(mat4(1.0f), vec3(0.f, 0.f, -j));
 
                            mat4 quad_mpv1 = x1 * z1;
@@ -206,39 +201,37 @@ int main(int argc, char*argv[])
                            glUniformMatrix4fv(modelViewProjection_XZ_GRID, 1, GL_FALSE, &quad_mpv4[0][0]);
                            glDrawArrays(GL_LINE_LOOP, 0, 4);
                        }
-
+                       
                    }
      
-            
-     
-            
-          
+ 
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[1]);
             glUseProgram(XYZ_Shader);
             
-            GLuint xyz_mvp = glGetUniformLocation(XYZ_Shader, "mvp");
-    
-            GLuint axis_color = glGetUniformLocation(XYZ_Shader, "axis_color");
-            glm::mat4 c_mvp =  projectionMatrix * viewMatrix * modelMatrix;
+            GLuint modelViewProjection_XYZ = glGetUniformLocation(XYZ_Shader, "mvp");
+            GLuint XYZ_color = glGetUniformLocation(XYZ_Shader, "xyz_color");
+            mat4 camera_ModelViewProject_XYZ =  projectionMatrix * viewMatrix * modelMatrix;
             
-            glUniformMatrix4fv(xyz_mvp, 1, GL_FALSE, &c_mvp[0][0]);
+            glUniformMatrix4fv(modelViewProjection_XYZ, 1, GL_FALSE, &camera_ModelViewProject_XYZ[0][0]);
 
          
             int XYZ_vertexIndex =0;
             for(int i =0; i<3;i++) {
-                glUniform3f(axis_color, XYZ_Colors[i].x,XYZ_Colors[i].y,XYZ_Colors[i].z);
+                glUniform3f(XYZ_color, XYZ_Colors[i].x,XYZ_Colors[i].y,XYZ_Colors[i].z);
                 glDrawArrays(GL_LINES, XYZ_vertexIndex, 2);
                 XYZ_vertexIndex = XYZ_vertexIndex +2;
                 }
 
 
-
-            
             
             // End Frame
             glfwSwapBuffers(window);
             glfwPollEvents();
+            
+            
+            
+            
             
             
             double mousePosX, mousePosY;
