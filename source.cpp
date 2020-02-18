@@ -59,20 +59,14 @@ int main(int argc, char*argv[])
         return -1;
     }
     
-    
 
-    
- 
-        
-        // Compile and link shaders here ...
- 
-        // We can set the shader once, since we have only one
-      // Use Shader Header to link and compile the 3 different shaders that will be used.
       
       //grid shader
     GLuint XZ_grid_shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader.fs");
     
     GLuint XYZ_Shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/xyz-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/xyz-shader.fs");
+    
+    GLuint olaf_Shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader.fs");
     
       
     
@@ -205,6 +199,8 @@ int main(int argc, char*argv[])
                    }
      
  
+            //draw XYZ coord
+            
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[1]);
             glUseProgram(XYZ_Shader);
@@ -224,6 +220,56 @@ int main(int argc, char*argv[])
                 }
 
 
+            //draw snowman
+            
+            glEnableVertexAttribArray(0);
+            glBindVertexArray(vertexArrayObjects[2]);
+            glUseProgram(olaf_Shader);
+            
+            mat4 camera_ModelViewProjection_Olaf =  projectionMatrix * viewMatrix;
+            
+            GLuint modelViewProjection_Olaf = glGetUniformLocation(olaf_Shader, "mvp");
+            GLuint olaf_Color = glGetUniformLocation(olaf_Shader, "olaf_color");
+            
+            //body
+            mat4 olaf_Body = camera_ModelViewProjection_Olaf * scale(mat4(1.0f), vec3(2.f, 2.f, 2.0f)) * translate(mat4(1.0f), vec3(0.f, 01.5f, 0.f));
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            
+            //upper body
+            olaf_Body = camera_ModelViewProjection_Olaf * translate(mat4(1.0f), vec3(0.f, 4.55f, 0.f)) * scale(mat4(1.0f), vec3(-1.5f, -1.3f, -1.6f));
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            
+            //head
+            olaf_Body = camera_ModelViewProjection_Olaf * translate(mat4(1.0f), vec3(0.f, 5.55f, 0.f)) * scale(mat4(1.0f), vec3(-0.7f, -0.7f, -1.1f));
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            
+            //left right
+            olaf_Body = camera_ModelViewProjection_Olaf * translate(mat4(1.0f), vec3(-0.0f, 1.3f, -0.5f)) * scale(mat4(1.0f), vec3(1.0f, 2.2f, -0.4f));
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            
+            //left leg
+            olaf_Body = camera_ModelViewProjection_Olaf * translate(mat4(1.0f), vec3(-0.0f, 1.3f, 0.5f)) * scale(mat4(1.0f), vec3(1.0f, 2.2f, -0.4f));
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            
+            olaf_Body =  olaf_Body * translate(mat4(1.0f), vec3(-0.0f, 10.3f, 0.5f));
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
+//            glDrawArrays(GL_TRIANGLES, 0, 36);
+            
+          
+            
+            
+            
             
             // End Frame
             glfwSwapBuffers(window);

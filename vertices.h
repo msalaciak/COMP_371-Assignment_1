@@ -97,6 +97,7 @@ static const vec3 snowman_vertices[] = {
     vec3( 0.5f, 0.5f, 0.5f),
     vec3( 0.5f, 0.5f,-0.5f),
     vec3(-0.5f, 0.5f,-0.5f),
+    
     vec3( 0.5f, 0.5f, 0.5f),
     vec3(-0.5f, 0.5f,-0.5f),
     vec3(-0.5f, 0.5f, 0.5f)

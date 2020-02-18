@@ -1,14 +1,15 @@
 #version 330 core
 
 // Interpolated values from the vertex shaders
-in vec3 vertexColor;
+in vec4 vertexColor;
 
 // Output data
-out vec3 color;
+out vec4 color;
 
-uniform vec3 xyz_color;
+uniform vec4 olaf_color;
 
 
 void main(){
-    color = xyz_color;
+    color = olaf_color;
 }
+
