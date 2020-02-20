@@ -328,6 +328,15 @@ int main(int argc, char*argv[])
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
+            
+            
+            //scarf
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.9f, 5.15f, 0.35f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.3f, 2.3f));
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniform4f(olaf_Color, 1.0f,0.0f,0.0f,1.0f);
+            glDrawArrays(primativeRender, 0, 36);
+            
+            
            
           
             
