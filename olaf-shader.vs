@@ -6,8 +6,8 @@
        uniform mat4 model;
        uniform mat4 view;
        uniform mat4 projection;
-       in vec4 color;
-        out vec4 vertexColor;
+       in vec3 color;
+        out vec3 vertexColor;
 
        void main()
        {

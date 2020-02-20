@@ -23,12 +23,15 @@ static const vec3 grid_vertices[] =
 {
     vec3(0.0f, 0.0f, 0.0f),
     vec3(1.0f, 0.0f, 0.0f),
-   
+
     vec3(1.0f, 0.0f, 1.0f),
     vec3(0.0f, 0.0f, 1.0f),
-    
-  
+
+
 };
+
+
+
 
 static const vec3 xyz_verticles [] = {
   
@@ -43,14 +46,21 @@ static const vec3 xyz_verticles [] = {
     //z
          vec3(0.0f, 0.5f,  0.0f),
          vec3(0.0f, 0.5f,  5.0f),
-
-    
-      
-    
-    
-    
     
 };
+
+
+static const vec3 XYZ_Colors[] =
+{
+    vec3(1.0f, 0.0f, 0.0f),
+    vec3(0.0f, 1.0f, 0.0f),
+    vec3(0.0f, 0.0f, 1.0)
+    
+  
+};
+
+
+
 
   // //cube model to use for snowman
 static const vec3 snowman_vertices[] = {
@@ -104,11 +114,4 @@ static const vec3 snowman_vertices[] = {
 
   };
 
-static const vec3 XYZ_Colors[] =
-{
-    vec3(1.0f, 0.0f, 0.0f),
-    vec3(0.0f, 1.0f, 0.0f),
-    vec3(0.0f, 0.0f, 1.0)
-    
-  
-};
+
