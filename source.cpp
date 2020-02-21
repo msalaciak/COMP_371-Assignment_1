@@ -29,6 +29,7 @@ int main(int argc, char*argv[])
 {
     mat4 translateOlaf(1.f);
     mat4 scaleOlaf(1.f);
+    mat4 rotateOlaf = rotate(mat4(1.0f), radians(90.0f),vec3(00.0f,90.0f, 0.0f));
     srand (time(NULL));
     int primativeRender = GL_TRIANGLES;
     // Initialize GLFW and OpenGL version
@@ -182,12 +183,11 @@ int main(int argc, char*argv[])
                                     mat4 x1 = modelViewProjection * translate(mat4(1.0f), vec3(i, 0.f, j));
                                         glUniformMatrix4fv(modelViewProjection_XZ_GRID, 1, GL_FALSE, &x1[0][0]);
                                         glDrawArrays(GL_LINE_LOOP, 0, 4);
-                                    mat4 z1 = modelViewProjection * translate(mat4(1.0f), vec3(j, 0.f, i));
-                                        glUniformMatrix4fv(modelViewProjection_XZ_GRID, 1, GL_FALSE, &z1[0][0]);
-                                        glDrawArrays(GL_LINE_LOOP, 0, 4);
+//
                                 }
                     }
             
+        
 
  
             //draw XYZ coord
@@ -217,7 +217,8 @@ int main(int argc, char*argv[])
             glBindVertexArray(vertexArrayObjects[2]);
             glUseProgram(olaf_Shader);
             
-            mat4 rotateOlaf = rotate(mat4(1.0f), radians(90.0f),vec3(00.0f,90.0f, 0.0f));
+            
+            
             mat4 WorldView_Olaf = projectionMatrix * viewMatrix * translateOlaf * scaleOlaf * rotateOlaf;
             
             GLuint modelViewProjection_Olaf = glGetUniformLocation(olaf_Shader, "mvp");
@@ -398,93 +399,233 @@ int main(int argc, char*argv[])
                        normalize(cameraSideVector);
 
             
-      if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // move camera to the left
-      {
-          cameraPosition.x -= currentCameraSpeed * dt*40;
-      }
-      
-      if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // move camera to the right
-      {
-          cameraPosition.x += currentCameraSpeed * dt*40;
-      }
-      
-      if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // move camera up
-      {
-          cameraPosition.y -= currentCameraSpeed * dt*40;
-      }
-      
-      if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // move camera down
-      {
-          cameraPosition.y += currentCameraSpeed * dt*40;
-      }
+//            glfwSetInputMode(window, GLFW_LOCK_KEY_MODS, GLFW_TRUE);
             
-      if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) // move camera up
-               {
-                   cameraPosition.z -= currentCameraSpeed * dt*40;
-               }
-               
-               if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) // move camera down
-               {
-                   cameraPosition.z += currentCameraSpeed * dt*40;
-               }
+            if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS ) // move camera to the left
+                {
+                    cameraPosition.x -= currentCameraSpeed * dt*40;
+                }
+
+            if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) // move camera to the right
+                {
+                    cameraPosition.x += currentCameraSpeed * dt*40;
+                }
             
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) // random position
+            if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) // camera zoom in
+                {
+                    cameraPosition.z -= currentCameraSpeed * dt*40;
+                }
+                                  
+            if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) // camera zoom ou
+                {
+                    cameraPosition.z += currentCameraSpeed * dt*40;
+                }
+
+            if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) // move camera up
+                {
+                    cameraPosition.y -= currentCameraSpeed * dt*40;
+                }
+
+            if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) // move camera down
+                {
+                    cameraPosition.y += currentCameraSpeed * dt*40;
+                }
+           
+         
+            
+            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) // move olaf to the left
+                {
+                  float xTrans = -0.1;
+                  xTrans = xTrans + 0.001f;
+                  translateOlaf = translateOlaf * translate(mat4(1.0f), vec3(xTrans, 0.0f, 0.0f));
+                }
+              
+            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // move olaf to the right
+                {
+                  float xTrans = 0.1;
+                  xTrans = xTrans + 0.001f;
+                  translateOlaf = translateOlaf * translate(mat4(1.0f), vec3(xTrans,0.0f, 0.0f));
+                }
+              
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // move olaf up
+                {
+                  float zTrans = 0.1;
+                  zTrans = zTrans + 0.001f;
+                  translateOlaf = translateOlaf * translate(mat4(1.0f), vec3(0.0f,0.0f, zTrans));
+                }
+              
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // move olaf down
+                {
+                  float zTrans = -0.1;
+                  zTrans = zTrans + 0.001f;
+                  translateOlaf = translateOlaf * translate(mat4(1.0f), vec3(0.0f,0.0f, zTrans));
+                }
+            
+            
+        
+            
+            if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) // random position
                  {
-                     
                      float xTrans = rand() % 7 + (-3);
                      float  zTrans = rand() % 7 + (-3);
                      translateOlaf = translateOlaf * translate(mat4(1.0f), vec3(xTrans, 0.0f, zTrans));
                  }
             
             if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) // scale up
-                          {
-                              
-                              float x =1;
-                              float y=1;
-                              float z=1;
-                              x+=0.01;
-                              y+=0.01;
-                              z+=0.01;
-                              scaleOlaf = scaleOlaf  * scale(mat4(1.0f), vec3(x, y, z));
-                          }
+                {
+                    float x =1;
+                    float y=1;
+                    float z=1;
+                    x+=0.01;
+                    y+=0.01;
+                    z+=0.01;
+                    scaleOlaf = scaleOlaf  * scale(mat4(1.0f), vec3(x, y, z));
+                }
 
             
             
             if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) // scale down
-                                   {
+                {
                                        
-                                       float x =1;
-                                       float y=1;
-                                       float z=1;
-                                       x-=0.01;
-                                       y-=0.01;
-                                       z-=0.01;
-                                       scaleOlaf = scaleOlaf  * scale(mat4(1.0f), vec3(x, y, z));
-                                   }
+                    float x =1;
+                    float y=1;
+                    float z=1;
+                    x-=0.01;
+                    y-=0.01;
+                    z-=0.01;
+                    scaleOlaf = scaleOlaf  * scale(mat4(1.0f), vec3(x, y, z));
+                                     
+                }
             
             
-            if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) // scale down
-                                   {
-                                       
-                                       primativeRender = GL_TRIANGLES;
-                                   }
+            if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) // primative change to trianges
+                {
+                    primativeRender = GL_TRIANGLES;
+                }
             
-            if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) // scale down
-                                             {
-                                                 
-                                                 primativeRender = GL_POINTS;
-                                             }
+            if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) // primative change to points
+                {
+                    primativeRender = GL_POINTS;
+                }
             
-            if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) // scale down
-            {
-                
+            if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) // primative change to lines
+                {
                 primativeRender = GL_LINES;
+                }
+      
+            
+            
+              if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) // scale rotate around the y axis counter clockwise
+                {
+                                                   
+                    float x =5.01;
+                    float y=5.01;
+                    float z=5.01;
+                    x-=0.01;
+                    y-=0.01;
+                    z-=0.01;
+                    rotateOlaf = rotateOlaf * rotate(mat4(1.0f), radians(x),vec3(0.0f,1.f, 0.f));
+                }
+            
+            if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) // scale rotate around the y axis clockwise
+                {
+                                                            
+                             float x =5.01;
+                             float y=5.01;
+                             float z=5.01;
+                             x+=0.01;
+                             y+=0.01;
+                             z+=0.01;
+                             rotateOlaf = rotateOlaf * rotate(mat4(1.0f), radians(x),vec3(0.0f,-1.f, 0.f));
+                         }
+            
+            if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) // rotate x and z together counter clockwise
+                                   {
+                                                                      
+                                       float x =5.01;
+                                       float y=5.01;
+                                       float z=5.01;
+                                       x+=0.01;
+                                       y+=0.01;
+                                       z+=0.01;
+                                       rotateOlaf = rotateOlaf * rotate(mat4(1.0f), radians(x),vec3(-1.0f,0.0f, -1.f));
+                                   }
+            
+            if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) // rotate x and z together clockwise
+            {
+                                               
+                float x =5.01;
+                float y=5.01;
+                float z=5.01;
+                x+=0.01;
+                y+=0.01;
+                z+=0.01;
+                rotateOlaf = rotateOlaf * rotate(mat4(1.0f), radians(x),vec3(1.0f,0.f, 1.f));
             }
-            //0 is for points
-            //3 is for lines
-            //
             
             
+            if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) // rotate x and z together clockwise
+                     {
+                                                        
+                         float x =5.01;
+                         float y=5.01;
+                         float z=5.01;
+                         x+=0.01;
+                         y+=0.01;
+                         z+=0.01;
+                         modelMatrix = modelMatrix * rotate(mat4(1.0f), radians(x),vec3(1.0f,0.f, 0.f));
+                     }
+            
+            if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) // rotate x and z together clockwise
+                             {
+                                                                
+                                 float x =5.01;
+                                 float y=5.01;
+                                 float z=5.01;
+                                 x+=0.01;
+                                 y+=0.01;
+                                 z+=0.01;
+                                 modelMatrix = modelMatrix * rotate(mat4(1.0f), radians(x),vec3(-1.0f,0.f, 0.f));
+                             }
+            
+            
+            
+            if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) // rotate x and z together clockwise
+                             {
+                                                                
+                                 float x =5.01;
+                                 float y=5.01;
+                                 float z=5.01;
+                                 x+=0.01;
+                                 y+=0.01;
+                                 z+=0.01;
+                                 modelMatrix = modelMatrix * rotate(mat4(1.0f), radians(x),vec3(0.0f,1.f, 0.f));
+                             }
+            
+            
+            if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) // rotate x and z together clockwise
+                             {
+                                                                
+                                 float x =5.01;
+                                 float y=5.01;
+                                 float z=5.01;
+                                 x+=0.01;
+                                 y+=0.01;
+                                 z+=0.01;
+                                 modelMatrix = modelMatrix * rotate(mat4(1.0f), radians(x),vec3(0.0f,-1.0f, 0.f));
+                             }
+            
+            if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) // rotate x and z together clockwise
+                                      {
+                                                                         
+                                          float x =5.01;
+                                          float y=5.01;
+                                          float z=5.01;
+                                          x+=0.01;
+                                          y+=0.01;
+                                          z+=0.01;
+                                          modelMatrix = mat4(1.0f);
+                                      }
             
             
             
