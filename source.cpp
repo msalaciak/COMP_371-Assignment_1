@@ -54,6 +54,8 @@ int main(int argc, char*argv[])
         glfwTerminate();
         return -1;
     }
+    
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwMakeContextCurrent(window);
     glViewport(0, 0, 1024, 768);
 
@@ -134,7 +136,6 @@ int main(int argc, char*argv[])
     
     // For frame time
     float lastFrameTime = glfwGetTime();
-    int lastMouseLeftState = GLFW_RELEASE;
     double lastMousePosX, lastMousePosY;
     glfwGetCursorPos(window, &lastMousePosX, &lastMousePosY);
     
@@ -143,7 +144,7 @@ int main(int argc, char*argv[])
     float cameraFastSpeed = 2 * cameraSpeed;
     float cameraHorizontalAngle = 90.0f;
     float cameraVerticalAngle = 0.0f;
-    bool  cameraFirstPerson = true; // press 1 or 2 to toggle this variable
+
         
         // Entering Main Loop
         while(!glfwWindowShouldClose(window))
@@ -180,9 +181,9 @@ int main(int argc, char*argv[])
                     {
                         for(int i=-50; i<=50; ++i)
                                 {
-                                    mat4 x1 = modelViewProjection * translate(mat4(1.0f), vec3(i, 0.f, j));
-                                        glUniformMatrix4fv(modelViewProjection_XZ_GRID, 1, GL_FALSE, &x1[0][0]);
-                                        glDrawArrays(GL_LINE_LOOP, 0, 4);
+                                    mat4 grid = modelViewProjection * translate(mat4(1.0f), vec3(i, 0.f, j));
+                                    glUniformMatrix4fv(modelViewProjection_XZ_GRID, 1, GL_FALSE, &grid[0][0]);
+                                    glDrawArrays(GL_LINE_LOOP, 0, 4);
 //
                                 }
                     }
@@ -269,25 +270,25 @@ int main(int argc, char*argv[])
             glDrawArrays(primativeRender, 0, 36);
             
             //nose
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.4f, 5.7f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.5f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.55f, 5.7f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.35f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,0.64f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
             
             //left eye
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.3f, 5.85f, -0.25f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.1f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.4f, 5.85f, -0.2f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.07f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
             
             //right eye
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.3f, 5.85f, 0.25f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.1f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.4f, 5.85f, 0.2f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.07f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
             
             //mouth
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.4f, 5.4f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.2f, 0.1f, -0.2f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.4f, 5.4f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.2f, 0.07f, -0.2f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
@@ -331,8 +332,28 @@ int main(int argc, char*argv[])
             glDrawArrays(primativeRender, 0, 36);
             
             
-            //scarf
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.9f, 5.15f, 0.35f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.3f, 2.3f));
+            //scarf left side
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.02f, 5.15f, -0.85f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -1.70f, -0.1f));
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniform4f(olaf_Color, 1.0f,0.0f,0.0f,1.0f);
+                glDrawArrays(primativeRender, 0, 36);
+            
+            //scarf right side
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.0f, 5.15f, 0.85f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -1.75f, -0.1f));
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniform4f(olaf_Color, 1.0f,0.0f,0.0f,1.0f);
+            glDrawArrays(primativeRender, 0, 36);
+            
+            //scarf back side
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.8f, 5.15f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.15f, 1.8f));
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniform4f(olaf_Color, 1.0f,0.0f,0.0f,1.0f);
+            glDrawArrays(primativeRender, 0, 36);
+            
+            
+            
+            //scarf overhang
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.8f, 5.15f, 0.35f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.15f, 2.3f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
@@ -399,7 +420,6 @@ int main(int argc, char*argv[])
                        normalize(cameraSideVector);
 
             
-//            glfwSetInputMode(window, GLFW_LOCK_KEY_MODS, GLFW_TRUE);
             
             if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS ) // move camera to the left
                 {
@@ -626,6 +646,9 @@ int main(int argc, char*argv[])
                                           z+=0.01;
                                           modelMatrix = mat4(1.0f);
                                       }
+            
+            if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+                 glfwSetWindowShouldClose(window, true);
             
             
             
