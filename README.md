@@ -1,4 +1,4 @@
-Matthew Salaciak 29644490
+
 COMP 371 Assignment 1 README files
 
 The assignment was to create a 3D olaf, placed onto a 100 x 100 grid in the XZ plane, with XYZ coordinate lines of 5 grid length each in 3 different colours.
