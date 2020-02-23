@@ -3,9 +3,10 @@
 //
 // Created by Matthew Salaciak 29644490.
 //
-// Inspired by the COMP 371 Lab 2,3 and 4 and the following tutorials:
+// Inspired by the COMP 371 Lectures and Lab 2,3 and 4 and the following tutorials:
 // - https://learnopengl.com/Getting-started/Hello-Triangle
 // - https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL (for shader class)
+// - http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
 
 
 #include <iostream>
@@ -20,6 +21,7 @@
 #include "Shader.h"
 #include <time.h>
 
+//define namespaces for glm and c++ std
 using namespace glm;
 using namespace std;
 
@@ -27,11 +29,16 @@ using namespace std;
 
 int main(int argc, char*argv[])
 {
+    
+    //define our identity matrix's for translate, rotate and scale olaf, this is used later on when I implement the key binding fuctions to control the olafs movements
     mat4 translateOlaf(1.f);
     mat4 scaleOlaf(1.f);
     mat4 rotateOlaf = rotate(mat4(1.0f), radians(90.0f),vec3(00.0f,90.0f, 0.0f));
+    
+    //random number initialization and int primativeRender is used to store the default rendering option which is GL_TRIANGLES
     srand (time(NULL));
     int primativeRender = GL_TRIANGLES;
+    
     // Initialize GLFW and OpenGL version
     glfwInit();
  
@@ -68,7 +75,7 @@ int main(int argc, char*argv[])
     
 
       
-      //grid shader
+     // the following functions loads the shader files and creates my shader objects for the XZ grid, the XYZ coordinate lines ans the olaf
     GLuint XZ_grid_shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader.fs");
     
     GLuint XYZ_Shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/xyz-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/xyz-shader.fs");
@@ -76,13 +83,13 @@ int main(int argc, char*argv[])
     GLuint olaf_Shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader.fs");
     
       
-    
+
       
-       glUseProgram(XZ_grid_shader);
 
-
-        
-        // Define and upload geometry to the GPU here ...
+    
+        // Define and upload geometry to the GPU here by creating a VAO and VBO that has the size of 3
+        // This way we can store of the geometry of all three objects at different indices.
+    
           GLuint vertexArrayObjects[3], vertexBufferObjects[3];
           glGenVertexArrays(3, vertexArrayObjects);
           glGenBuffers(3, vertexBufferObjects);
@@ -99,7 +106,7 @@ int main(int argc, char*argv[])
           glBufferData(GL_ARRAY_BUFFER, sizeof(xyz_verticles), xyz_verticles, GL_STATIC_DRAW);
           glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
           
-          
+          //bind olaf vertices
           glBindVertexArray(vertexArrayObjects[2]);
           glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjects[2]);
           glBufferData(GL_ARRAY_BUFFER, sizeof(snowman_vertices), snowman_vertices, GL_STATIC_DRAW);
@@ -124,26 +131,22 @@ int main(int argc, char*argv[])
  
     
     // Set projection matrix for shader, this won't change
-                  mat4 projectionMatrix = mat4(1.0f);
-                  projectionMatrix = perspective(radians(45.0f),1024.0f / 768.0f, 0.1f,100.0f);
-
-                  mat4 viewMatrix = lookAt(cameraPosition,  // eye
-                                           cameraPosition + cameraLookAt,  // center
-                                           cameraUp ); // up
-                 mat4 modelMatrix = mat4(1.0f);
-
-                 mat4 modelViewProjection = projectionMatrix * viewMatrix * modelMatrix;
+        mat4 projectionMatrix = mat4(1.0f);
+        projectionMatrix = perspective(radians(45.0f),1024.0f / 768.0f, 0.1f,100.0f);
+        mat4 viewMatrix = lookAt(cameraPosition, cameraPosition + cameraLookAt,cameraUp );
+        mat4 modelMatrix = mat4(1.0f);
+        mat4 modelViewProjection = projectionMatrix * viewMatrix * modelMatrix;
     
-    // For frame time
-    float lastFrameTime = glfwGetTime();
-    double lastMousePosX, lastMousePosY;
-    glfwGetCursorPos(window, &lastMousePosX, &lastMousePosY);
+        // For frame time
+        float lastFrameTime = glfwGetTime();
+        double lastMousePosX, lastMousePosY;
+        glfwGetCursorPos(window, &lastMousePosX, &lastMousePosY);
     
-    
-    float cameraSpeed = 0.5f;
-    float cameraFastSpeed = 2 * cameraSpeed;
-    float cameraHorizontalAngle = 90.0f;
-    float cameraVerticalAngle = 0.0f;
+        //camera information for mouse implementation
+        float cameraSpeed = 0.5f;
+        float cameraFastSpeed = 2 * cameraSpeed;
+        float cameraHorizontalAngle = 90.0f;
+        float cameraVerticalAngle = 0.0f;
 
         
         // Entering Main Loop
@@ -156,27 +159,27 @@ int main(int argc, char*argv[])
             float currentCameraSpeed = (fastCam) ? cameraFastSpeed : cameraSpeed;
 
 
-              
+            //setting up the MVP of the world so I can place our objects within
              modelViewProjection = projectionMatrix * viewMatrix * modelMatrix;
             
       
-            // Black background
-                glClearColor(0.2f, 0.29f, 0.29f,1.0f);
+            // set the background color to the greenish grey
+            glClearColor(0.2f, 0.29f, 0.29f,1.0f);
     
-    
+            // clear the color and depth buffer at the beginning of each loop
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             
-            // Draw geometry for grid
+            //geometry for grid
              glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[0]);
             glUseProgram(XZ_grid_shader);
 
-            // Draw grid
+           
          
+            //get the MVP of the grid from the shader
             GLuint modelViewProjection_XZ_GRID = glGetUniformLocation(XZ_grid_shader, "mvp");
-       
-
+            // Draw grid
             for(int j=-50; j<=50; ++j)
                     {
                         for(int i=-50; i<=50; ++i)
@@ -184,26 +187,27 @@ int main(int argc, char*argv[])
                                     mat4 grid = modelViewProjection * translate(mat4(1.0f), vec3(i, 0.f, j));
                                     glUniformMatrix4fv(modelViewProjection_XZ_GRID, 1, GL_FALSE, &grid[0][0]);
                                     glDrawArrays(GL_LINE_LOOP, 0, 4);
-//
                                 }
                     }
             
         
 
  
-            //draw XYZ coord
+            //geometry for the XYZ coord
             
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[1]);
             glUseProgram(XYZ_Shader);
             
+            //get the MVP of the XYZ from the shader, get the color uniform variable so we can set each line to its own color
             GLuint modelViewProjection_XYZ = glGetUniformLocation(XYZ_Shader, "mvp");
             GLuint XYZ_color = glGetUniformLocation(XYZ_Shader, "xyz_color");
+            //create the MVP of the camera to be placed within the world
             mat4 camera_ModelViewProject_XYZ =  projectionMatrix * viewMatrix * modelMatrix;
             
             glUniformMatrix4fv(modelViewProjection_XYZ, 1, GL_FALSE, &camera_ModelViewProject_XYZ[0][0]);
 
-         
+            //quick for loop to draw the 3 lines, and takes its colors from the XYZ colors array which is stored in the vertices header
             int XYZ_vertexIndex =0;
             for(int i =0; i<3;i++) {
                 glUniform3f(XYZ_color, XYZ_Colors[i].x,XYZ_Colors[i].y,XYZ_Colors[i].z);
@@ -212,16 +216,17 @@ int main(int argc, char*argv[])
                 }
 
 
-            //draw snowman
+            //geometry for the olaf
             
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[2]);
             glUseProgram(olaf_Shader);
             
             
-            
+            //get the worldview of the olaf within the scene
             mat4 WorldView_Olaf = projectionMatrix * viewMatrix * translateOlaf * scaleOlaf * rotateOlaf;
             
+            //get the mvp of the olaf and the olaf uniform color variable so we can use it to make eyes, buttons, gloves, nose, scarf.
             GLuint modelViewProjection_Olaf = glGetUniformLocation(olaf_Shader, "mvp");
             GLuint olaf_Color = glGetUniformLocation(olaf_Shader, "olaf_color");
             
@@ -383,43 +388,43 @@ int main(int argc, char*argv[])
             
             
             
-            
-            
-            
+            //this part here which controls the camera via the mouse X,Y inputs
+            //it is edited and adapted from my solution to lab 4
             double mousePosX, mousePosY;
-                       glfwGetCursorPos(window, &mousePosX, &mousePosY);
+            glfwGetCursorPos(window, &mousePosX, &mousePosY);
                        
-                       double dx = mousePosX - lastMousePosX;
-                       double dy = mousePosY - lastMousePosY;
+            double dx = mousePosX - lastMousePosX;
+            double dy = mousePosY - lastMousePosY;
                        
-                       lastMousePosX = mousePosX;
-                       lastMousePosY = mousePosY;
+            lastMousePosX = mousePosX;
+            lastMousePosY = mousePosY;
                        
-                       // Convert to spherical coordinates
-                       const float cameraAngularSpeed = 10.0f;
-                       cameraHorizontalAngle -= dx * cameraAngularSpeed * dt;
-                       cameraVerticalAngle   -= dy * cameraAngularSpeed * dt;
+            // Convert to spherical coordinates
+            const float cameraAngularSpeed = 10.0f;
+            cameraHorizontalAngle -= dx * cameraAngularSpeed * dt;
+            cameraVerticalAngle   -= dy * cameraAngularSpeed * dt;
                        
-                       // Clamp vertical angle to [-85, 85] degrees
-                       cameraVerticalAngle = std::max(-85.0f, std::min(85.0f, cameraVerticalAngle));
-                       if (cameraHorizontalAngle > 360)
-                       {
-                           cameraHorizontalAngle -= 360;
-                       }
-                       else if (cameraHorizontalAngle < -360)
-                       {
-                           cameraHorizontalAngle += 360;
-                       }
+            // Clamp vertical angle to -180,180 (for full rotation!)
+            cameraVerticalAngle = std::max(-180.0f, std::min(180.0f, cameraVerticalAngle));
+            if (cameraHorizontalAngle > 360)
+                {
+                    cameraHorizontalAngle -= 360;
+                }
+            else if (cameraHorizontalAngle < -360)
+                {
+                    cameraHorizontalAngle += 360;
+                }
                        
-                       float theta = radians(cameraHorizontalAngle);
-                       float phi = radians(cameraVerticalAngle);
+            float theta = radians(cameraHorizontalAngle);
+            float phi = radians(cameraVerticalAngle);
                        
-                       cameraLookAt = vec3(cosf(phi)*cosf(theta), sinf(phi), -cosf(phi)*sinf(theta));
-                       vec3 cameraSideVector = cross(cameraLookAt, vec3(0.0f, 1.0f, 0.0f));
-                       
-                       normalize(cameraSideVector);
+            cameraLookAt = vec3(cosf(phi)*cosf(theta), sinf(phi), -cosf(phi)*sinf(theta));
+            vec3 cameraSideVector = cross(cameraLookAt, vec3(0.0f, 1.0f, 0.0f));
+            normalize(cameraSideVector);
 
             
+            
+            //these are the following keybindings to control the olaf, the camera and the world orientation
             
             if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS ) // move camera to the left
                 {
@@ -436,17 +441,17 @@ int main(int argc, char*argv[])
                     cameraPosition.z -= currentCameraSpeed * dt*40;
                 }
                                   
-            if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) // camera zoom ou
+            if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) // camera zoom out
                 {
                     cameraPosition.z += currentCameraSpeed * dt*40;
                 }
 
-            if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) // move camera up
+            if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) // move camera down
                 {
                     cameraPosition.y -= currentCameraSpeed * dt*40;
                 }
 
-            if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) // move camera down
+            if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) // move camera up
                 {
                     cameraPosition.y += currentCameraSpeed * dt*40;
                 }
@@ -482,8 +487,6 @@ int main(int argc, char*argv[])
                 }
             
             
-        
-            
             if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) // random position
                  {
                      float xTrans = rand() % 7 + (-3);
@@ -502,7 +505,6 @@ int main(int argc, char*argv[])
                     scaleOlaf = scaleOlaf  * scale(mat4(1.0f), vec3(x, y, z));
                 }
 
-            
             
             if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) // scale down
                 {
@@ -535,7 +537,7 @@ int main(int argc, char*argv[])
       
             
             
-              if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) // scale rotate around the y axis counter clockwise
+              if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) // rotate around the y axis counter clockwise
                 {
                                                    
                     float x =5.01;
@@ -547,7 +549,7 @@ int main(int argc, char*argv[])
                     rotateOlaf = rotateOlaf * rotate(mat4(1.0f), radians(x),vec3(0.0f,1.f, 0.f));
                 }
             
-            if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) // scale rotate around the y axis clockwise
+            if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) // rotate around the y axis clockwise
                 {
                                                             
                              float x =5.01;
@@ -584,67 +586,67 @@ int main(int argc, char*argv[])
             }
             
             
-            if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) // rotate x and z together clockwise
+            if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) // rotate X axis in the other orientation of the world
                      {
                                                         
-                         float x =5.01;
-                         float y=5.01;
-                         float z=5.01;
-                         x+=0.01;
-                         y+=0.01;
-                         z+=0.01;
-                         modelMatrix = modelMatrix * rotate(mat4(1.0f), radians(x),vec3(1.0f,0.f, 0.f));
+                float x =5.01;
+                float y=5.01;
+                float z=5.01;
+                x+=0.01;
+                y+=0.01;
+                z+=0.01;
+                modelMatrix = modelMatrix * rotate(mat4(1.0f), radians(x),vec3(1.0f,0.f, 0.f));
                      }
             
-            if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) // rotate x and z together clockwise
+            if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) // rotate X axis in the other orientation of the world
                              {
                                                                 
-                                 float x =5.01;
-                                 float y=5.01;
-                                 float z=5.01;
-                                 x+=0.01;
-                                 y+=0.01;
-                                 z+=0.01;
-                                 modelMatrix = modelMatrix * rotate(mat4(1.0f), radians(x),vec3(-1.0f,0.f, 0.f));
+                float x =5.01;
+                float y=5.01;
+                float z=5.01;
+                x+=0.01;
+                y+=0.01;
+                z+=0.01;
+                modelMatrix = modelMatrix * rotate(mat4(1.0f), radians(x),vec3(-1.0f,0.f, 0.f));
                              }
             
             
             
-            if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) // rotate x and z together clockwise
+            if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) //rotate Y axis of the world
                              {
                                                                 
-                                 float x =5.01;
-                                 float y=5.01;
-                                 float z=5.01;
-                                 x+=0.01;
-                                 y+=0.01;
-                                 z+=0.01;
-                                 modelMatrix = modelMatrix * rotate(mat4(1.0f), radians(x),vec3(0.0f,1.f, 0.f));
+                float x =5.01;
+                float y=5.01;
+                float z=5.01;
+                x+=0.01;
+                y+=0.01;
+                z+=0.01;
+                modelMatrix = modelMatrix * rotate(mat4(1.0f), radians(x),vec3(0.0f,1.f, 0.f));
                              }
             
             
-            if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) // rotate x and z together clockwise
+            if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) // rotate Y axis of the world in the other orientation
                              {
                                                                 
-                                 float x =5.01;
-                                 float y=5.01;
-                                 float z=5.01;
-                                 x+=0.01;
-                                 y+=0.01;
-                                 z+=0.01;
-                                 modelMatrix = modelMatrix * rotate(mat4(1.0f), radians(x),vec3(0.0f,-1.0f, 0.f));
+                float x =5.01;
+                float y=5.01;
+                float z=5.01;
+                x+=0.01;
+                y+=0.01;
+                z+=0.01;
+                modelMatrix = modelMatrix * rotate(mat4(1.0f), radians(x),vec3(0.0f,-1.0f, 0.f));
                              }
             
-            if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) // rotate x and z together clockwise
-                                      {
+            if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) // reset world orientation to original settings
+                            {
                                                                          
-                                          float x =5.01;
-                                          float y=5.01;
-                                          float z=5.01;
-                                          x+=0.01;
-                                          y+=0.01;
-                                          z+=0.01;
-                                          modelMatrix = mat4(1.0f);
+              float x =5.01;
+              float y=5.01;
+              float z=5.01;
+              x+=0.01;
+              y+=0.01;
+              z+=0.01;
+              modelMatrix = mat4(1.0f);
                                       }
             
             if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)

@@ -1,10 +1,8 @@
-//
 //  Shader.h
 //  A1_29644490
-//
-//  Created by Matt Salaciak on 2020-02-17.
-//  Copyright © 2020 Concordia. All rights reserved.
-//
+// COMP 371 Assignment 1
+// Created by Matthew Salaciak 29644490.
+
 
 
 #include <glm/glm.hpp>
