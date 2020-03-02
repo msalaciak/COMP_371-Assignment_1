@@ -38,6 +38,7 @@ int main(int argc, char*argv[])
     //random number initialization and int primativeRender is used to store the default rendering option which is GL_TRIANGLES
     srand (time(NULL));
     int primativeRender = GL_TRIANGLES;
+    float  fovAngle = 45.0f;
     
     // Initialize GLFW and OpenGL version
     glfwInit();
@@ -132,7 +133,7 @@ int main(int argc, char*argv[])
     
     // Set projection matrix for shader, this won't change
         mat4 projectionMatrix = mat4(1.0f);
-        projectionMatrix = perspective(radians(45.0f),1024.0f / 768.0f, 0.1f,100.0f);
+        projectionMatrix = perspective(radians(fovAngle),1024.0f / 768.0f, 0.1f,100.0f);
         mat4 viewMatrix = lookAt(cameraPosition, cameraPosition + cameraLookAt,cameraUp );
         mat4 modelMatrix = mat4(1.0f);
         mat4 modelViewProjection = projectionMatrix * viewMatrix * modelMatrix;
@@ -438,12 +439,12 @@ int main(int argc, char*argv[])
             
             if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) // camera zoom in
                 {
-                    cameraPosition.z -= currentCameraSpeed * dt*40;
+                    fovAngle = fovAngle  - 0.1f;
                 }
                                   
             if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) // camera zoom out
                 {
-                    cameraPosition.z += currentCameraSpeed * dt*40;
+                    fovAngle = fovAngle + 0.1f;
                 }
 
             if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) // move camera down
@@ -655,6 +656,8 @@ int main(int argc, char*argv[])
             
             
             viewMatrix = lookAt(cameraPosition, cameraPosition + cameraLookAt, cameraUp );
+            projectionMatrix = perspective(radians(fovAngle),1024.0f / 768.0f, 0.1f,100.0f);
+            
             
          
         }
