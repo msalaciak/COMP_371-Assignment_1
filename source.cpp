@@ -20,10 +20,13 @@
 #include "vertices.h"
 #include "Shader.h"
 #include <time.h>
+#include "texture-loader.h"
+
 
 //define namespaces for glm and c++ std
 using namespace glm;
 using namespace std;
+
 
 
 
@@ -38,9 +41,12 @@ int main(int argc, char*argv[])
     //random number initialization and int primativeRender is used to store the default rendering option which is GL_TRIANGLES
     srand (time(NULL));
     int primativeRender = GL_TRIANGLES;
+    int primativeRender1 = GL_TRIANGLE_STRIP;
     float  fovAngle = 45.0f;
+    numOfVertices = sizeof(vertexBuffer) / sizeof(Vertex);
     
     // Initialize GLFW and OpenGL version
+   
     glfwInit();
  
 #if defined(PLATFORM_OSX)
@@ -54,6 +60,12 @@ int main(int argc, char*argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 #endif
 
+    
+    
+    
+    
+    
+    
     // Create Window and rendering context using GLFW, resolution is 1024x768
     GLFWwindow* window = glfwCreateWindow(1024, 768, "A1_29644490", NULL, NULL);
     if (window == NULL)
@@ -74,14 +86,25 @@ int main(int argc, char*argv[])
         return -1;
     }
     
+            // Load Textures
+        #if defined(PLATFORM_OSX)
+            GLuint brickTextureID = loadTexture("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Xcode/Textures/snowmantexture.jpg");
+    //        GLuint cementTextureID = loadTexture("/Users/matthew/Documents/school/WINTER 2020/COMP 371/labs/lab 4/Lab_Framework/Xcode/Textures/cement.jpg");
+        #else
+            GLuint brickTextureID = loadTexture("../Assets/Textures/brick.jpg");
+    //        GLuint cementTextureID = loadTexture("../Assets/Textures/cement.jpg");
+        #endif
 
       
      // the following functions loads the shader files and creates my shader objects for the XZ grid, the XYZ coordinate lines ans the olaf
     GLuint XZ_grid_shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader.fs");
-    
+
     GLuint XYZ_Shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/xyz-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/xyz-shader.fs");
     
     GLuint olaf_Shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader.fs");
+    
+    //texture shaders
+       GLuint XZ_grid_shader_Textured = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader.fs");
     
       
 
@@ -91,9 +114,9 @@ int main(int argc, char*argv[])
         // Define and upload geometry to the GPU here by creating a VAO and VBO that has the size of 3
         // This way we can store of the geometry of all three objects at different indices.
     
-          GLuint vertexArrayObjects[3], vertexBufferObjects[3];
-          glGenVertexArrays(3, vertexArrayObjects);
-          glGenBuffers(3, vertexBufferObjects);
+          GLuint vertexArrayObjects[4], vertexBufferObjects[4];
+          glGenVertexArrays(4, vertexArrayObjects);
+          glGenBuffers(4, vertexBufferObjects);
           
           //bind grid vertices
           glBindVertexArray(vertexArrayObjects[0]);
@@ -107,12 +130,23 @@ int main(int argc, char*argv[])
           glBufferData(GL_ARRAY_BUFFER, sizeof(xyz_verticles), xyz_verticles, GL_STATIC_DRAW);
           glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
           
-          //bind olaf vertices
+          //bind olaf vertices (use for eyes / buttons / hat
           glBindVertexArray(vertexArrayObjects[2]);
           glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjects[2]);
           glBufferData(GL_ARRAY_BUFFER, sizeof(snowman_vertices), snowman_vertices, GL_STATIC_DRAW);
           glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
           glEnableVertexAttribArray(0);
+    
+         //bind olaf sphere for body / arms / legs
+         glBindVertexArray(vertexArrayObjects[3]);
+         glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjects[3]);
+         glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBuffer), vertexBuffer, GL_STATIC_DRAW);
+         //sphere vertex position
+         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+         glEnableVertexAttribArray(0);
+         //sphere vertex normal position
+         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(vec3));
+         glEnableVertexAttribArray(1);
 
 
 
@@ -220,7 +254,7 @@ int main(int argc, char*argv[])
             //geometry for the olaf
             
             glEnableVertexAttribArray(0);
-            glBindVertexArray(vertexArrayObjects[2]);
+            glBindVertexArray(vertexArrayObjects[3]);
             glUseProgram(olaf_Shader);
             
             
@@ -232,75 +266,82 @@ int main(int argc, char*argv[])
             GLuint olaf_Color = glGetUniformLocation(olaf_Shader, "olaf_color");
             
             //body
-            mat4 olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.f, 3.5f, 0.f))* scale(mat4(1.0f), vec3(2.f, 2.f, 2.0f));
+            mat4 olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.f, 3.5f, 0.f))* scale(mat4(1.0f), vec3(1.3f, 1.3f, 1.3f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
             
-            glDrawArrays(primativeRender, 0, 36);
+            glDrawArrays(primativeRender1, 0, numOfVertices);
             
             //upper body
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.f, 4.55f, 0.f)) * scale(mat4(1.0f), vec3(-1.5f, -1.3f, -1.6f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.f, 4.65f, 0.f)) * scale(mat4(1.0f), vec3(0.85f, 0.85f, 0.85f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+            glDrawArrays(primativeRender1, 0, numOfVertices);
             
             //head
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.f, 5.55f, 0.f)) * scale(mat4(1.0f), vec3(-0.7f, -1.3f, -1.0f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.f, 5.65f, 0.f)) * scale(mat4(1.0f), vec3(0.7f, 0.7f, 0.7f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+            glDrawArrays(primativeRender1, 0, numOfVertices);
+            
+            //switch back to cube vertices
+                    glEnableVertexAttribArray(0);
+                    glBindVertexArray(vertexArrayObjects[2]);
+                    glUseProgram(olaf_Shader);
             
             //right leg
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 1.3f, -0.5f)) * scale(mat4(1.0f), vec3(1.0f, 2.5f, -0.4f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+               glDrawArrays(primativeRender, 0, 36);
             
             //left leg
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 1.3f, 0.5f)) * scale(mat4(1.0f), vec3(1.0f, 2.5f, -0.4f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+               glDrawArrays(primativeRender, 0, 36);
             
             
             //left arm
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 4.7f, 1.50f)) * rotate(mat4(1.0f), radians(90.0f), vec3(6.0f, 0.0f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 1.8f, -0.2f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+               glDrawArrays(primativeRender, 0, 36);
             
             //right arm
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 4.7f, -1.50f)) * rotate(mat4(1.0f), radians(90.0f), vec3(6.0f, 0.0f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 1.8f, -0.2f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+               glDrawArrays(primativeRender, 0, 36);
+            
+    
             
             //nose
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.55f, 5.7f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.35f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.896f, 5.7f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.35f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,0.64f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
             
             //left eye
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.4f, 5.85f, -0.2f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.07f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.696f, 5.85f, -0.2f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.07f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
             
             //right eye
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.4f, 5.85f, 0.2f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.07f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.696f, 5.85f, 0.2f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.07f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
             
             //mouth
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.4f, 5.4f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.2f, 0.07f, -0.2f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.698f, 5.4f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.2f, -0.13f, -0.25f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
             
             //buttons
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-1.087f, 4.4f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.1f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-1.0f, 4.4f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.1f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.39f,0.26f,0.13f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
@@ -339,19 +380,19 @@ int main(int argc, char*argv[])
             
             
             //scarf left side
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.02f, 5.15f, -0.85f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -1.70f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.02f, 5.25f, -0.69f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -1.70f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,0.0f,0.0f,1.0f);
                 glDrawArrays(primativeRender, 0, 36);
             
             //scarf right side
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.0f, 5.15f, 0.85f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -1.75f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.0f, 5.25f, 0.69f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -1.75f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
             
             //scarf back side
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.8f, 5.15f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.15f, 1.8f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.8f, 5.25f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.15f, 1.29f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
@@ -359,19 +400,19 @@ int main(int argc, char*argv[])
             
             
             //scarf overhang
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.8f, 5.15f, 0.35f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.15f, 2.3f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.8f, 5.25f, 0.30f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.15f, 1.9f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
             
             //hat brim
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.25f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.5f, 1.75f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.30f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.5f, 1.75f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
             
             //hat top
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.55f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.5f, -0.5f, 1.4f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.60f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.5f, -0.5f, 1.4f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
@@ -524,16 +565,19 @@ int main(int argc, char*argv[])
             if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) // primative change to trianges
                 {
                     primativeRender = GL_TRIANGLES;
+                    primativeRender1 = GL_TRIANGLE_STRIP;
                 }
             
             if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) // primative change to points
                 {
                     primativeRender = GL_POINTS;
+                    primativeRender1 = GL_POINTS;
                 }
             
             if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) // primative change to lines
                 {
                 primativeRender = GL_LINES;
+                primativeRender1 = GL_LINES;
                 }
       
             
