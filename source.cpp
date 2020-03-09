@@ -98,9 +98,11 @@ int main(int argc, char*argv[])
         #if defined(PLATFORM_OSX)
             GLuint snowTextureID = loadTexture("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Xcode/Textures/snowtexture3.jpg");
             GLuint carrotTextureID = loadTexture("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Xcode/Textures/carrot.jpg");
+            GLuint shinyMetalTextureID = loadTexture("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Xcode/Textures/shinymetal.jpg");
         #else
             GLuint brickTextureID = loadTexture("../Assets/Textures/brick.jpg");
             GLuint carrot = loadTexture("../Assets/Textures/cement.jpg");
+            GLuint shinymetal = loadTexture("../Assets/Textures/cement.jpg");
         #endif
 
       
@@ -482,22 +484,47 @@ int main(int argc, char*argv[])
 
             
             glEnableVertexAttribArray(0);
-                              glBindVertexArray(vertexArrayObjects[2]);
-                              glUseProgram(olaf_Shader);
+            glBindVertexArray(vertexArrayObjects[2]);
+            glUseProgram(olaf_Shader);
+            
+            
             
             //hat brim
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.50f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, 1.2f, 1.75f));
+            if(!shaderOn) {
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.50f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.1f, 1.2f, 1.75f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
-            
+
             //hat top
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.70f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.5f, 1.2f, 1.4f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.70f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.7f, 1.2f, 1.4f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
+            }
             
+            //texture hat brim
+            if (shaderOn) {
+            glUseProgram(olaf_Shader_Textured);
+                       glActiveTexture(GL_TEXTURE0);
+                       GLuint textureLocation = glGetUniformLocation(olaf_Shader_Textured, "textureSampler");
+                       glBindTexture(GL_TEXTURE_2D, shinyMetalTextureID);
+                       glUniform1i(textureLocation, 0);
+                       GLuint modelViewProjection_Olaf_Texture = glGetUniformLocation(olaf_Shader_Textured, "mvp");
+                       
             
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.50f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.1f, 1.2f, 1.75f));
+                       glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
+                      glBindTexture(GL_TEXTURE_2D, shinyMetalTextureID);
+                       glDrawArrays(primativeRender, 0, 36);
+                       
+            //textured hat top
+                       olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.8f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.7f, 1.2f, 1.4f));
+                       glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
+                    glBindTexture(GL_TEXTURE_2D, shinyMetalTextureID);
+                       glDrawArrays(primativeRender, 0, 36);
+            
+            }
            
           
             
