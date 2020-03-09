@@ -19,14 +19,33 @@
 using namespace glm;
 using namespace std;
 
+    unsigned int numOfVerticesGrid;
 
-static const vec3 grid_vertices[] =
+struct grid
 {
-    vec3(0.0f, 0.0f, 0.0f),
-    vec3(1.0f, 0.0f, 0.0f),
+   grid(vec3 _position, vec2 _uv)
+      : position(_position), uv(_uv) {}
+      
+      vec3 position;
+     
+      vec2 uv;
+};
 
-    vec3(1.0f, 0.0f, 1.0f),
-    vec3(0.0f, 0.0f, 1.0f),
+
+static const grid grid_vertices[] =
+{
+//    grid (vec3(0.0f, 0.0f, 0.0f), vec2 (1.0f, 1.0f)),
+//    grid  (vec3(1.0f, 0.0f, 0.0f), vec2 (1.0f, 0.0f)),
+//
+//    grid(vec3(1.0f, 0.0f, 1.0f), vec2 (0.0f, 0.0f)),
+//    grid (vec3(0.0f, 0.0f, 1.0f), vec2 (0.0f, 1.0f)),
+    
+    grid (vec3(1.0f, 0.0f, 1.0f), vec2 (1.0f, 1.0f)),
+    grid  (vec3(1.0f, 0.0f, -1.0f), vec2 (1.0f, 0.0f)),
+
+    grid(vec3(-1.0f, 0.0f, -1.0f), vec2 (0.0f, 0.0f)),
+    grid (vec3(-1.0f, 0.0f, 1.0f), vec2 (0.0f, 1.0f)),
+    
 
 
 };
@@ -117,12 +136,12 @@ static const vec3 snowman_vertices[] = {
 
 struct Vertex
   {
-      glm::vec3 position;
-      glm::vec3 normal;
-      glm::vec3 color;
+      vec3 position;
+      vec3 normal;
+      vec3 color;
   };
 
-    unsigned int numOfVertices;
+    unsigned int numOfVerticesSphere;
     
 static const Vertex  vertexBuffer[] = {
        // position,                                    normal,                              color

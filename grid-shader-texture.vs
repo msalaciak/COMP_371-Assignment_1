@@ -13,12 +13,12 @@
        uniform mat4 view;
        uniform mat4 projection;
        out vec3 vertexColor;
-       out vec2 vertexUV
+       out vec2 vertexUV;
 
        void main()
        {
            gl_Position = mvp * vec4(aPos, 1.0f);
             vertexColor = aPos;
-            vertexUV = aUV
+           vertexUV = aUV;
        }
         

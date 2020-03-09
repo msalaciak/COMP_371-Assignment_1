@@ -43,7 +43,8 @@ int main(int argc, char*argv[])
     int primativeRender = GL_TRIANGLES;
     int primativeRender1 = GL_TRIANGLE_STRIP;
     float  fovAngle = 45.0f;
-    numOfVertices = sizeof(vertexBuffer) / sizeof(Vertex);
+    numOfVerticesSphere = sizeof(vertexBuffer) / sizeof(Vertex);
+    numOfVerticesGrid = sizeof(grid_vertices) / sizeof(grid);
     
     // Initialize GLFW and OpenGL version
    
@@ -88,7 +89,7 @@ int main(int argc, char*argv[])
     
             // Load Textures
         #if defined(PLATFORM_OSX)
-            GLuint brickTextureID = loadTexture("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Xcode/Textures/snowmantexture.jpg");
+            GLuint brickTextureID = loadTexture("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Xcode/Textures/snowtexture3.jpg");
     //        GLuint cementTextureID = loadTexture("/Users/matthew/Documents/school/WINTER 2020/COMP 371/labs/lab 4/Lab_Framework/Xcode/Textures/cement.jpg");
         #else
             GLuint brickTextureID = loadTexture("../Assets/Textures/brick.jpg");
@@ -104,7 +105,7 @@ int main(int argc, char*argv[])
     GLuint olaf_Shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader.fs");
     
     //texture shaders
-       GLuint XZ_grid_shader_Textured = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader.fs");
+       GLuint XZ_grid_shader_Textured = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader-texture.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader-texture.fs");
     
       
 
@@ -122,7 +123,12 @@ int main(int argc, char*argv[])
           glBindVertexArray(vertexArrayObjects[0]);
           glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjects[0]);
           glBufferData(GL_ARRAY_BUFFER, sizeof(grid_vertices), grid_vertices, GL_STATIC_DRAW);
-          glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+          glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(grid), (void*)0);
+          glEnableVertexAttribArray(0);
+    
+          glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(grid), (void*)sizeof(vec3));
+          glEnableVertexAttribArray(1);
+    
           
           //bind xyz vertices
           glBindVertexArray(vertexArrayObjects[1]);
@@ -147,6 +153,9 @@ int main(int argc, char*argv[])
          //sphere vertex normal position
          glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(vec3));
          glEnableVertexAttribArray(1);
+    
+    
+      
 
 
 
@@ -155,7 +164,9 @@ int main(int argc, char*argv[])
         // Enable Backface culling
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
-       
+        glDepthFunc(GL_LESS);
+
+
 
 
     
@@ -206,24 +217,43 @@ int main(int argc, char*argv[])
 
             
             //geometry for grid
-             glEnableVertexAttribArray(0);
+//             glEnableVertexAttribArray(0);
+//            glBindVertexArray(vertexArrayObjects[0]);
+//            glUseProgram(XZ_grid_shader);
+            
+            //geometry for grid with texture
+            glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[0]);
-            glUseProgram(XZ_grid_shader);
+            glUseProgram(XZ_grid_shader_Textured);
+            glActiveTexture(GL_TEXTURE0);
+            GLuint textureLocation = glGetUniformLocation(XZ_grid_shader_Textured, "textureSampler");
+            glBindTexture(GL_TEXTURE_2D, brickTextureID);
+            glUniform1i(textureLocation, 0);
+            
+            
 
-           
+       
          
             //get the MVP of the grid from the shader
-            GLuint modelViewProjection_XZ_GRID = glGetUniformLocation(XZ_grid_shader, "mvp");
+//            GLuint modelViewProjection_XZ_GRID = glGetUniformLocation(XZ_grid_shader, "mvp");
+            
+            //get the MVP of the grid from the textured shader
+            GLuint modelViewProjection_XZ_GRID = glGetUniformLocation(XZ_grid_shader_Textured, "mvp");
             // Draw grid
             for(int j=-50; j<=50; ++j)
                     {
                         for(int i=-50; i<=50; ++i)
                                 {
                                     mat4 grid = modelViewProjection * translate(mat4(1.0f), vec3(i, 0.f, j));
+                                     glBindTexture(GL_TEXTURE_2D, brickTextureID);
                                     glUniformMatrix4fv(modelViewProjection_XZ_GRID, 1, GL_FALSE, &grid[0][0]);
-                                    glDrawArrays(GL_LINE_LOOP, 0, 4);
+                                    glDrawArrays(GL_TRIANGLES, 0, numOfVerticesGrid);
                                 }
                     }
+            
+            
+            
+     
             
         
 
@@ -270,19 +300,19 @@ int main(int argc, char*argv[])
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
             
-            glDrawArrays(primativeRender1, 0, numOfVertices);
+            glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             //upper body
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.f, 4.65f, 0.f)) * scale(mat4(1.0f), vec3(0.85f, 0.85f, 0.85f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.f, 4.65f, 0.f)) * scale(mat4(1.0f), vec3(0.95f, 0.95f, 0.95f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
-            glDrawArrays(primativeRender1, 0, numOfVertices);
+            glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             //head
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.f, 5.65f, 0.f)) * scale(mat4(1.0f), vec3(0.7f, 0.7f, 0.7f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.f, 5.95f, 0.f)) * scale(mat4(1.0f), vec3(0.7f, 0.7f, 0.7f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,1.0f,1.0f,1.0f);
-            glDrawArrays(primativeRender1, 0, numOfVertices);
+            glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             //switch back to cube vertices
                     glEnableVertexAttribArray(0);
@@ -317,102 +347,95 @@ int main(int argc, char*argv[])
     
             
             //nose
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.896f, 5.7f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.35f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.896f, 5.9f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.35f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,0.64f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
             
+            glEnableVertexAttribArray(0);
+                       glBindVertexArray(vertexArrayObjects[3]);
+                       glUseProgram(olaf_Shader);
+                       
+            
             //left eye
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.696f, 5.85f, -0.2f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.07f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.696f, 6.05f, -0.2f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.01f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+            glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             //right eye
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.696f, 5.85f, 0.2f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.07f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.696f, 6.05f, 0.2f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.01f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+            glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             //mouth
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.698f, 5.4f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.2f, -0.13f, -0.25f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.698f, 5.7f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.01f, 0.2f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+            glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             //buttons
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-1.0f, 4.4f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.1f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-1.0f, 4.4f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, 0.03f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.39f,0.26f,0.13f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+            glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             //buttons
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-1.087f, 4.2f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.1f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-1.087f, 4.0f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, 0.03f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.39f,0.26f,0.13f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+            glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
                     
             
             //buttons
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-1.087f, 4.0f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.1f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-1.087f, 3.6f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, 0.03f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.39f,0.26f,0.13f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+            glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
                     
             //buttons
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-1.087f, 3.8f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.1f, -0.1f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-1.093f, 3.2f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, 0.03f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.39f,0.26f,0.13f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+            glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             //left glove
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.0f, 4.7f, -2.5f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.3f, -0.3f, -0.3f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+            glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             
             //right glove
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.0f, 4.7f, 2.5f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.3f, -0.3f, -0.3f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
-            
-            
-            //scarf left side
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.02f, 5.25f, -0.69f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -1.70f, -0.1f));
-            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-            glUniform4f(olaf_Color, 1.0f,0.0f,0.0f,1.0f);
-                glDrawArrays(primativeRender, 0, 36);
-            
-            //scarf right side
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.0f, 5.25f, 0.69f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -1.75f, -0.1f));
-            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-            glUniform4f(olaf_Color, 1.0f,0.0f,0.0f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
-            
-            //scarf back side
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.8f, 5.25f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.15f, 1.29f));
-            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-            glUniform4f(olaf_Color, 1.0f,0.0f,0.0f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+            glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             
             
-            //scarf overhang
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.8f, 5.25f, 0.30f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.15f, 1.9f));
-            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-            glUniform4f(olaf_Color, 1.0f,0.0f,0.0f,1.0f);
-            glDrawArrays(primativeRender, 0, 36);
+            //scarf
+                      olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.0f, 5.45f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.15f, 1.0f, 0.8f));
+                      glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
+                      glUniform4f(olaf_Color, 1.0f,0.0f,0.0f,1.0f);
+                          glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
+            
+            
+
+            
+            glEnableVertexAttribArray(0);
+                              glBindVertexArray(vertexArrayObjects[2]);
+                              glUseProgram(olaf_Shader);
             
             //hat brim
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.30f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, -0.5f, 1.75f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.50f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.1f, 1.2f, 1.75f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
             
             //hat top
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.60f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.5f, -0.5f, 1.4f));
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.70f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.5f, 1.2f, 1.4f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 0.0f,0.0f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
