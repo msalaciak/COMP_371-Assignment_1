@@ -27,6 +27,10 @@
 using namespace glm;
 using namespace std;
 
+//global variables and functions
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+bool shaderOn = true;
+
 
 
 
@@ -37,6 +41,8 @@ int main(int argc, char*argv[])
     mat4 translateOlaf(1.f);
     mat4 scaleOlaf(1.f);
     mat4 rotateOlaf = rotate(mat4(1.0f), radians(90.0f),vec3(00.0f,90.0f, 0.0f));
+    
+   
     
     //random number initialization and int primativeRender is used to store the default rendering option which is GL_TRIANGLES
     srand (time(NULL));
@@ -79,6 +85,7 @@ int main(int argc, char*argv[])
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwMakeContextCurrent(window);
     glViewport(0, 0, 1024, 768);
+    glfwSetKeyCallback(window, key_callback);
 
     glewExperimental = true; // Needed for core profile
     if (glewInit() != GLEW_OK) {
@@ -89,11 +96,11 @@ int main(int argc, char*argv[])
     
             // Load Textures
         #if defined(PLATFORM_OSX)
-            GLuint brickTextureID = loadTexture("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Xcode/Textures/snowtexture3.jpg");
-    //        GLuint cementTextureID = loadTexture("/Users/matthew/Documents/school/WINTER 2020/COMP 371/labs/lab 4/Lab_Framework/Xcode/Textures/cement.jpg");
+            GLuint snowTextureID = loadTexture("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Xcode/Textures/snowtexture3.jpg");
+            GLuint carrotTextureID = loadTexture("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Xcode/Textures/carrot.jpg");
         #else
             GLuint brickTextureID = loadTexture("../Assets/Textures/brick.jpg");
-    //        GLuint cementTextureID = loadTexture("../Assets/Textures/cement.jpg");
+            GLuint carrot = loadTexture("../Assets/Textures/cement.jpg");
         #endif
 
       
@@ -105,7 +112,13 @@ int main(int argc, char*argv[])
     GLuint olaf_Shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader.fs");
     
     //texture shaders
+    
+    //textured ground
        GLuint XZ_grid_shader_Textured = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader-texture.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader-texture.fs");
+    
+    //textured olaf parts (For nose and hat)
+    
+    GLuint olaf_Shader_Textured = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader-texture.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader-texture.fs");
     
       
 
@@ -136,14 +149,20 @@ int main(int argc, char*argv[])
           glBufferData(GL_ARRAY_BUFFER, sizeof(xyz_verticles), xyz_verticles, GL_STATIC_DRAW);
           glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
           
-          //bind olaf vertices (use for eyes / buttons / hat
-          glBindVertexArray(vertexArrayObjects[2]);
-          glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjects[2]);
-          glBufferData(GL_ARRAY_BUFFER, sizeof(snowman_vertices), snowman_vertices, GL_STATIC_DRAW);
-          glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-          glEnableVertexAttribArray(0);
+          //bind olaf vertices (use for nose / arms / legs / hat)
+//
+            glBindVertexArray(vertexArrayObjects[2]);
+             glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjects[2]);
+             glBufferData(GL_ARRAY_BUFFER, sizeof(snowman_vertices), snowman_vertices, GL_STATIC_DRAW);
+             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(snowman), (void*)0);
+             glEnableVertexAttribArray(0);
+       
+             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(snowman), (void*)sizeof(vec3));
+             glEnableVertexAttribArray(1);
     
-         //bind olaf sphere for body / arms / legs
+    
+    
+         //bind olaf sphere for body / upper body / head / eyes / mouth / buttons / gloves
          glBindVertexArray(vertexArrayObjects[3]);
          glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjects[3]);
          glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBuffer), vertexBuffer, GL_STATIC_DRAW);
@@ -216,43 +235,61 @@ int main(int argc, char*argv[])
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             
+            if (!shaderOn) {
+                
+                
             //geometry for grid
-//             glEnableVertexAttribArray(0);
-//            glBindVertexArray(vertexArrayObjects[0]);
-//            glUseProgram(XZ_grid_shader);
+             glEnableVertexAttribArray(0);
+            glBindVertexArray(vertexArrayObjects[0]);
+            glUseProgram(XZ_grid_shader);
             
+            
+                   //get the MVP of the grid from the shader
+               GLuint modelViewProjection_XZ_GRID = glGetUniformLocation(XZ_grid_shader, "mvp");
+            // Draw grid
+                     for(int j=-50; j<=50; ++j)
+                             {
+                                 for(int i=-50; i<=50; ++i)
+                                         {
+                                             mat4 grid = modelViewProjection * translate(mat4(1.0f), vec3(i, 0.f, j));
+                                             glUniformMatrix4fv(modelViewProjection_XZ_GRID, 1, GL_FALSE, &grid[0][0]);
+                                             glDrawArrays(GL_LINE_LOOP, 0, numOfVerticesGrid);
+                                         }
+                             }
+            
+            }
+            
+            
+            
+            if (shaderOn) {
             //geometry for grid with texture
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[0]);
             glUseProgram(XZ_grid_shader_Textured);
             glActiveTexture(GL_TEXTURE0);
             GLuint textureLocation = glGetUniformLocation(XZ_grid_shader_Textured, "textureSampler");
-            glBindTexture(GL_TEXTURE_2D, brickTextureID);
+            glBindTexture(GL_TEXTURE_2D, snowTextureID);
             glUniform1i(textureLocation, 0);
             
             
 
        
-         
-            //get the MVP of the grid from the shader
-//            GLuint modelViewProjection_XZ_GRID = glGetUniformLocation(XZ_grid_shader, "mvp");
-            
             //get the MVP of the grid from the textured shader
-            GLuint modelViewProjection_XZ_GRID = glGetUniformLocation(XZ_grid_shader_Textured, "mvp");
+            GLuint modelViewProjection_XZ_GRID_Texture = glGetUniformLocation(XZ_grid_shader_Textured, "mvp");
             // Draw grid
             for(int j=-50; j<=50; ++j)
                     {
                         for(int i=-50; i<=50; ++i)
                                 {
                                     mat4 grid = modelViewProjection * translate(mat4(1.0f), vec3(i, 0.f, j));
-                                     glBindTexture(GL_TEXTURE_2D, brickTextureID);
-                                    glUniformMatrix4fv(modelViewProjection_XZ_GRID, 1, GL_FALSE, &grid[0][0]);
+                                     glBindTexture(GL_TEXTURE_2D, snowTextureID);
+                                    glUniformMatrix4fv(modelViewProjection_XZ_GRID_Texture, 1, GL_FALSE, &grid[0][0]);
                                     glDrawArrays(GL_TRIANGLES, 0, numOfVerticesGrid);
                                 }
                     }
             
             
-            
+            }
      
             
         
@@ -347,14 +384,34 @@ int main(int argc, char*argv[])
     
             
             //nose
+            if (!shaderOn) {
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.896f, 5.9f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.35f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform4f(olaf_Color, 1.0f,0.64f,0.0f,1.0f);
             glDrawArrays(primativeRender, 0, 36);
+            }
+            
+            
+            //nose textured
+            
+            if(shaderOn) {
+            glUseProgram(olaf_Shader_Textured);
+            glActiveTexture(GL_TEXTURE0);
+            GLuint textureLocation = glGetUniformLocation(olaf_Shader_Textured, "textureSampler");
+            glBindTexture(GL_TEXTURE_2D, carrotTextureID);
+            glUniform1i(textureLocation, 0);
+            GLuint modelViewProjection_Olaf_Texture = glGetUniformLocation(olaf_Shader_Textured, "mvp");
+            
+            
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.896f, 5.9f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.35f, -0.1f));
+            glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
+            glBindTexture(GL_TEXTURE_2D, carrotTextureID);
+            glDrawArrays(primativeRender, 0, 36);
+            }
             
             glEnableVertexAttribArray(0);
-                       glBindVertexArray(vertexArrayObjects[3]);
-                       glUseProgram(olaf_Shader);
+            glBindVertexArray(vertexArrayObjects[3]);
+            glUseProgram(olaf_Shader);
                        
             
             //left eye
@@ -489,7 +546,9 @@ int main(int argc, char*argv[])
 
             
             
-            //these are the following keybindings to control the olaf, the camera and the world orientation
+            //these are the following keybindings to control the olaf, the camera and the world orientation, textures, lighting and shadows
+            
+
             
             if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS ) // move camera to the left
                 {
@@ -738,7 +797,11 @@ int main(int argc, char*argv[])
 
 
     
-     
+     void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+     {
+         if (key == GLFW_KEY_X && action == GLFW_PRESS)
+             shaderOn = !shaderOn;
+     }
    
     
     

@@ -7,13 +7,17 @@
 
 
 in vec3 vertexColor;
+in vec2 vertexUV;
+
 
 
 out vec4 color;
-
+uniform sampler2D textureSampler;
 uniform vec4 olaf_color;
 
 
 void main(){
-    color = vec4(olaf_color.r,olaf_color.g,olaf_color.b,olaf_color.a);
+     vec4 textureColor = texture( textureSampler, vertexUV );
+    color = textureColor;
 }
+
