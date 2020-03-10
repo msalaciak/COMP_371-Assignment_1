@@ -110,6 +110,9 @@ int main(int argc, char*argv[])
 
     GLuint nonTexturedShader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/shader-noTexture.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/shader-noTexture.fs");
     
+    GLuint XYZ_Shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/xyz-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/xyz-shader.fs");
+       
+    
     //texture shader
     
        GLuint textureShader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/shader-texture.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/shader-texture.fs");
@@ -284,25 +287,27 @@ int main(int argc, char*argv[])
  
             //geometry for the XYZ coord
             
+       
+                  
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[1]);
-            glUseProgram(nonTexturedShader);
-            
+            glUseProgram(XYZ_Shader);
+                  
             //get the MVP of the XYZ from the shader, get the color uniform variable so we can set each line to its own color
-            GLuint modelViewProjection_XYZ = glGetUniformLocation(nonTexturedShader, "mvp");
-            GLuint XYZ_color = glGetUniformLocation(nonTexturedShader, "olaf_color");
-            //create the MVP of the camera to be placed within the world
+            GLuint modelViewProjection_XYZ = glGetUniformLocation(XYZ_Shader, "mvp");
+            GLuint XYZ_color = glGetUniformLocation(XYZ_Shader, "xyz_color");
+                  //create the MVP of the camera to be placed within the world
             mat4 camera_ModelViewProject_XYZ =  projectionMatrix * viewMatrix * modelMatrix;
-            
+                  
             glUniformMatrix4fv(modelViewProjection_XYZ, 1, GL_FALSE, &camera_ModelViewProject_XYZ[0][0]);
 
-            //quick for loop to draw the 3 lines, and takes its colors from the XYZ colors array which is stored in the vertices header
+                  //quick for loop to draw the 3 lines, and takes its colors from the XYZ colors array which is stored in the vertices header
             int XYZ_vertexIndex =0;
             for(int i =0; i<3;i++) {
                 glUniform3f(XYZ_color, XYZ_Colors[i].x,XYZ_Colors[i].y,XYZ_Colors[i].z);
                 glDrawArrays(GL_LINES, XYZ_vertexIndex, 2);
                 XYZ_vertexIndex = XYZ_vertexIndex +2;
-                }
+                      }
 
 
             //geometry for the olaf
