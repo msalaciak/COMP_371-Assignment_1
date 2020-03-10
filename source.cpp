@@ -30,6 +30,8 @@ using namespace std;
 //global variables and functions
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 bool textureOn = true;
+vec3 lightpos (0.f, 30.0f,0.f);
+
 
 
 
@@ -41,6 +43,7 @@ int main(int argc, char*argv[])
     mat4 translateOlaf(1.f);
     mat4 scaleOlaf(1.f);
     mat4 rotateOlaf = rotate(mat4(1.0f), radians(90.0f),vec3(00.0f,90.0f, 0.0f));
+    
     
    
     
@@ -111,6 +114,8 @@ int main(int argc, char*argv[])
     GLuint nonTexturedShader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/shader-noTexture.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/shader-noTexture.fs");
     
     GLuint XYZ_Shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/xyz-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/xyz-shader.fs");
+    
+    GLuint lamp_Shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/lampShader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/lampShader.fs");
        
     
     //texture shader
@@ -127,9 +132,9 @@ int main(int argc, char*argv[])
         // Define and upload geometry to the GPU here by creating a VAO and VBO that has the size of 3
         // This way we can store of the geometry of all three objects at different indices.
     
-          GLuint vertexArrayObjects[4], vertexBufferObjects[4];
-          glGenVertexArrays(4, vertexArrayObjects);
-          glGenBuffers(4, vertexBufferObjects);
+          GLuint vertexArrayObjects[5], vertexBufferObjects[5];
+          glGenVertexArrays(5, vertexArrayObjects);
+          glGenBuffers(5, vertexBufferObjects);
           
           //bind grid vertices
           glBindVertexArray(vertexArrayObjects[0]);
@@ -172,6 +177,16 @@ int main(int argc, char*argv[])
          glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(vec3));
          glEnableVertexAttribArray(1);
     
+        //normals for light source
+        glBindVertexArray(vertexArrayObjects[4]);
+         glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjects[4]);
+         glBufferData(GL_ARRAY_BUFFER, sizeof(lightcube), lightcube, GL_STATIC_DRAW);
+         //cube vertex position
+         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(lamp), (void*)0);
+         glEnableVertexAttribArray(0);
+         //cube vertex normal position
+         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(lamp), (void*)sizeof(vec3));
+         glEnableVertexAttribArray(1);
     
       
 
@@ -310,6 +325,18 @@ int main(int argc, char*argv[])
                       }
 
 
+            //lamp (light source)
+            glEnableVertexAttribArray(0);
+            glBindVertexArray(vertexArrayObjects[4]);
+            glUseProgram(lamp_Shader);
+            
+            mat4 WorldView_lamp = projectionMatrix * viewMatrix * modelMatrix * translate(mat4(1.0f),lightpos);
+            GLuint lampshader_MVP = glGetUniformLocation(lamp_Shader, "mvp");
+            glUniformMatrix4fv(lampshader_MVP, 1, GL_FALSE, &WorldView_lamp[0][0]);
+            glDrawArrays(primativeRender, 0, 36);
+            
+            
+            
             //geometry for the olaf
             
             glEnableVertexAttribArray(0);
