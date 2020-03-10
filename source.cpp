@@ -108,18 +108,13 @@ int main(int argc, char*argv[])
       
      // the following functions loads the shader files and creates my shader objects for the XZ grid, the XYZ coordinate lines ans the olaf
 
-    GLuint XYZ_Shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/xyz-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/xyz-shader.fs");
+    GLuint nonTexturedShader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/shader-noTexture.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/shader-noTexture.fs");
     
-    GLuint olaf_Shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader.fs");
+    //texture shader
     
-    //texture shaders
+       GLuint textureShader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/shader-texture.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/shader-texture.fs");
     
-    //textured ground
-       GLuint XZ_grid_shader_Textured = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader-texture.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/grid-shader-texture.fs");
-    
-    //textured olaf parts (For nose and hat)
-    
-    GLuint olaf_Shader_Textured = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader-texture.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/olaf-shader-texture.fs");
+
     
       
 
@@ -239,13 +234,14 @@ int main(int argc, char*argv[])
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[0]);
             //set shader
-            glUseProgram(XZ_grid_shader_Textured);
+            glUseProgram(textureShader);
             //get the MVP of the grid from the shader
-            GLuint modelViewProjection_XZ_GRID_Texture = glGetUniformLocation(XZ_grid_shader_Textured, "mvp");
+            GLuint modelViewProjection_XZ_GRID_Texture = glGetUniformLocation(textureShader, "mvp");
+             GLuint gridcolor = glGetUniformLocation(textureShader, "color");
             
             //no texture
             if (!textureOn) {
-            glUniform1ui(glGetUniformLocation(XZ_grid_shader_Textured, "textureOn"), 0);
+            glUniform1ui(glGetUniformLocation(textureShader, "textureOn"), 0);
 
             // Draw grid
                      for(int j=-50; j<=50; ++j)
@@ -254,6 +250,7 @@ int main(int argc, char*argv[])
                                          {
                                              mat4 grid = modelViewProjection * translate(mat4(1.0f), vec3(i, 0.f, j));
                                              glUniformMatrix4fv(modelViewProjection_XZ_GRID_Texture, 1, GL_FALSE, &grid[0][0]);
+                                             glUniform3f(gridcolor, 0.56f, 0.45f, 0.13f);
                                              glDrawArrays(GL_LINE_LOOP, 0, numOfVerticesGrid);
                                          }
                              }
@@ -262,9 +259,9 @@ int main(int argc, char*argv[])
             //texture
             if (textureOn) {
          
-            glUniform1i(glGetUniformLocation(XZ_grid_shader_Textured, "textureOn"), 1);
+            glUniform1i(glGetUniformLocation(textureShader, "textureOn"), 1);
             glActiveTexture(GL_TEXTURE0);
-            GLuint textureLocation = glGetUniformLocation(XZ_grid_shader_Textured, "textureSampler");
+            GLuint textureLocation = glGetUniformLocation(textureShader, "textureSampler");
             glBindTexture(GL_TEXTURE_2D, snowTextureID);
             glUniform1i(textureLocation, 0);
             
@@ -289,11 +286,11 @@ int main(int argc, char*argv[])
             
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[1]);
-            glUseProgram(XYZ_Shader);
+            glUseProgram(nonTexturedShader);
             
             //get the MVP of the XYZ from the shader, get the color uniform variable so we can set each line to its own color
-            GLuint modelViewProjection_XYZ = glGetUniformLocation(XYZ_Shader, "mvp");
-            GLuint XYZ_color = glGetUniformLocation(XYZ_Shader, "xyz_color");
+            GLuint modelViewProjection_XYZ = glGetUniformLocation(nonTexturedShader, "mvp");
+            GLuint XYZ_color = glGetUniformLocation(nonTexturedShader, "olaf_color");
             //create the MVP of the camera to be placed within the world
             mat4 camera_ModelViewProject_XYZ =  projectionMatrix * viewMatrix * modelMatrix;
             
@@ -312,15 +309,15 @@ int main(int argc, char*argv[])
             
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[3]);
-            glUseProgram(olaf_Shader);
+            glUseProgram(nonTexturedShader);
             
             
             //get the worldview of the olaf within the scene
             mat4 WorldView_Olaf = projectionMatrix * viewMatrix * translateOlaf * scaleOlaf * rotateOlaf;
             
             //get the mvp of the olaf and the olaf uniform color variable so we can use it to make eyes, buttons, gloves, nose, scarf.
-            GLuint modelViewProjection_Olaf = glGetUniformLocation(olaf_Shader, "mvp");
-            GLuint olaf_Color = glGetUniformLocation(olaf_Shader, "olaf_color");
+            GLuint modelViewProjection_Olaf = glGetUniformLocation(nonTexturedShader, "mvp");
+            GLuint olaf_Color = glGetUniformLocation(nonTexturedShader, "olaf_color");
             
             //body
             mat4 olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.f, 3.5f, 0.f))* scale(mat4(1.0f), vec3(1.3f, 1.3f, 1.3f));
@@ -338,38 +335,38 @@ int main(int argc, char*argv[])
             //head
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.f, 5.95f, 0.f)) * scale(mat4(1.0f), vec3(0.7f, 0.7f, 0.7f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-             glUniform3f(olaf_Color, 1.0f,1.0f,1.0f);
+            glUniform3f(olaf_Color, 1.0f,1.0f,1.0f);
             glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             //switch back to cube vertices
-                    glEnableVertexAttribArray(0);
-                    glBindVertexArray(vertexArrayObjects[2]);
-                    glUseProgram(olaf_Shader);
+            glEnableVertexAttribArray(0);
+            glBindVertexArray(vertexArrayObjects[2]);
+            glUseProgram(nonTexturedShader);
             
             //right leg
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 1.3f, -0.5f)) * scale(mat4(1.0f), vec3(1.0f, 2.5f, -0.4f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform3f(olaf_Color, 1.0f,1.0f,1.0f);
-               glDrawArrays(primativeRender, 0, 36);
+            glDrawArrays(primativeRender, 0, 36);
             
             //left leg
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 1.3f, 0.5f)) * scale(mat4(1.0f), vec3(1.0f, 2.5f, -0.4f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-             glUniform3f(olaf_Color, 1.0f,1.0f,1.0f);
-               glDrawArrays(primativeRender, 0, 36);
+            glUniform3f(olaf_Color, 1.0f,1.0f,1.0f);
+            glDrawArrays(primativeRender, 0, 36);
             
             
             //left arm
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 4.7f, 1.50f)) * rotate(mat4(1.0f), radians(90.0f), vec3(6.0f, 0.0f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 1.8f, -0.2f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-             glUniform3f(olaf_Color, 1.0f,1.0f,1.0f);
-               glDrawArrays(primativeRender, 0, 36);
+            glUniform3f(olaf_Color, 1.0f,1.0f,1.0f);
+            glDrawArrays(primativeRender, 0, 36);
             
             //right arm
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 4.7f, -1.50f)) * rotate(mat4(1.0f), radians(90.0f), vec3(6.0f, 0.0f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 1.8f, -0.2f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-           glUniform3f(olaf_Color, 1.0f,1.0f,1.0f);
-               glDrawArrays(primativeRender, 0, 36);
+            glUniform3f(olaf_Color, 1.0f,1.0f,1.0f);
+            glDrawArrays(primativeRender, 0, 36);
             
     
             
@@ -385,12 +382,12 @@ int main(int argc, char*argv[])
             //nose textured
             
             if(textureOn) {
-            glUseProgram(olaf_Shader_Textured);
+            glUseProgram(textureShader);
             glActiveTexture(GL_TEXTURE0);
-            GLuint textureLocation = glGetUniformLocation(olaf_Shader_Textured, "textureSampler");
+            GLuint textureLocation = glGetUniformLocation(textureShader, "textureSampler");
             glBindTexture(GL_TEXTURE_2D, carrotTextureID);
             glUniform1i(textureLocation, 0);
-            GLuint modelViewProjection_Olaf_Texture = glGetUniformLocation(olaf_Shader_Textured, "mvp");
+            GLuint modelViewProjection_Olaf_Texture = glGetUniformLocation(textureShader, "mvp");
             
             
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.896f, 5.9f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.35f, -0.1f));
@@ -401,7 +398,7 @@ int main(int argc, char*argv[])
             
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[3]);
-            glUseProgram(olaf_Shader);
+            glUseProgram(nonTexturedShader);
                        
             
             //left eye
@@ -463,17 +460,17 @@ int main(int argc, char*argv[])
             
             
             //scarf
-                      olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.0f, 5.45f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.15f, 1.0f, 0.8f));
-                      glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-            glUniform3f(olaf_Color, 1.0f,0.0f,0.0f);
-                          glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
+//            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.0f, 5.45f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.15f, 1.0f, 0.8f));
+//            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
+//            glUniform3f(olaf_Color, 1.0f,0.0f,0.0f);
+//            glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             
 
             
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[2]);
-            glUseProgram(olaf_Shader);
+            glUseProgram(nonTexturedShader);
             
             
             
@@ -493,36 +490,30 @@ int main(int argc, char*argv[])
             
             //texture hat brim
             if (textureOn) {
-            glUseProgram(olaf_Shader_Textured);
-                       glActiveTexture(GL_TEXTURE0);
-                       GLuint textureLocation = glGetUniformLocation(olaf_Shader_Textured, "textureSampler");
-                       glBindTexture(GL_TEXTURE_2D, shinyMetalTextureID);
-                       glUniform1i(textureLocation, 0);
-                       GLuint modelViewProjection_Olaf_Texture = glGetUniformLocation(olaf_Shader_Textured, "mvp");
+            glUseProgram(textureShader);
+            glActiveTexture(GL_TEXTURE0);
+            GLuint textureLocation = glGetUniformLocation(textureShader, "textureSampler");
+            glBindTexture(GL_TEXTURE_2D, shinyMetalTextureID);
+            glUniform1i(textureLocation, 0);
+            GLuint modelViewProjection_Olaf_Texture = glGetUniformLocation(textureShader, "mvp");
                        
             
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.50f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.1f, 1.2f, 1.75f));
-                       glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
-                      glBindTexture(GL_TEXTURE_2D, shinyMetalTextureID);
-                       glDrawArrays(primativeRender, 0, 36);
+            glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
+            glBindTexture(GL_TEXTURE_2D, shinyMetalTextureID);
+            glDrawArrays(primativeRender, 0, 36);
                        
             //textured hat top
-                       olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.8f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.7f, 1.2f, 1.4f));
-                       glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
-                    glBindTexture(GL_TEXTURE_2D, shinyMetalTextureID);
-                       glDrawArrays(primativeRender, 0, 36);
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.8f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.7f, 1.2f, 1.4f));
+            glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
+            glBindTexture(GL_TEXTURE_2D, shinyMetalTextureID);
+            glDrawArrays(primativeRender, 0, 36);
             
             }
-           
-          
-            
-            
-            
-            
+
             // End Frame
             glfwSwapBuffers(window);
             glfwPollEvents();
-            
             
             
             //this part here which controls the camera via the mouse X,Y inputs

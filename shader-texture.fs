@@ -13,6 +13,7 @@ uniform sampler2D textureSampler;
 uniform vec3 color;
 uniform  bool textureOn;
 
+
 void main()
 {
     
@@ -22,7 +23,7 @@ void main()
         
     }else
     if(!textureOn) {
-        FragColor = vec4(0.56f, 0.45f, 0.13f, 1.0f);
+        FragColor = vec4(color.r, color.g, color.b, 1.0f);
     }
     
 }
