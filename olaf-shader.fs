@@ -11,9 +11,9 @@ in vec3 vertexColor;
 
 out vec4 color;
 
-uniform vec4 olaf_color;
+uniform vec3 olaf_color;
 
 
 void main(){
-    color = vec4(olaf_color.r,olaf_color.g,olaf_color.b,olaf_color.a);
+    color = vec4(olaf_color.r,olaf_color.g,olaf_color.b,1);
 }

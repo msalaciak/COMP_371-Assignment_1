@@ -3,8 +3,6 @@
 // Created by Matthew Salaciak 29644490.
 
 
-
-
 #version 330 core
 
         layout (location = 0) in vec3 aPos;
