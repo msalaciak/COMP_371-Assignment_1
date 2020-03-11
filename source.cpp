@@ -36,6 +36,7 @@ vec3 lightpos (0.f, 30.0f,0.f);
 
 
 
+
 int main(int argc, char*argv[])
 {
     
@@ -143,8 +144,8 @@ int main(int argc, char*argv[])
           glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(grid), (void*)0);
           glEnableVertexAttribArray(0);
     
-          glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(grid), (void*)sizeof(vec3));
-          glEnableVertexAttribArray(1);
+          glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(grid), (void*)(2*sizeof(vec3)));
+          glEnableVertexAttribArray(2);
     
           
           //bind xyz vertices
@@ -160,9 +161,12 @@ int main(int argc, char*argv[])
              glBufferData(GL_ARRAY_BUFFER, sizeof(snowman_vertices), snowman_vertices, GL_STATIC_DRAW);
              glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(snowman), (void*)0);
              glEnableVertexAttribArray(0);
+    
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(snowman), (void*)sizeof(vec3));
+            glEnableVertexAttribArray(1);
        
-             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(snowman), (void*)sizeof(vec3));
-             glEnableVertexAttribArray(1);
+             glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(snowman), (void*)(2*sizeof(vec3)));
+             glEnableVertexAttribArray(2);
     
     
     
@@ -204,7 +208,7 @@ int main(int argc, char*argv[])
 
     
     // Camera parameters for view transform
-         vec3 cameraPosition(0.0f,10.0f,30.0f);
+         vec3 cameraPosition(0.0f,15.0f,30.0f);
          vec3 cameraLookAt(0.0f, 0.0f, 0.0f);
          vec3 cameraUp(0.0f, 1.0f, 0.0f);
  
@@ -241,12 +245,20 @@ int main(int argc, char*argv[])
             //setting up the MVP of the world so I can place our objects within
              modelViewProjection = projectionMatrix * viewMatrix * modelMatrix;
             
+        
       
             // set the background color to the greenish grey
             glClearColor(0.2f, 0.29f, 0.29f,1.0f);
     
             // clear the color and depth buffer at the beginning of each loop
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            
+            
+            glUseProgram(nonTexturedShader);
+            GLuint lightPosition = glGetUniformLocation(nonTexturedShader, "lightPos");
+            glUniform3f(lightPosition, lightpos.x,lightpos.y,lightpos.z);
+            GLuint viewPosition = glGetUniformLocation(nonTexturedShader, "viewPos");
+            glUniform3f(viewPosition, cameraPosition.x,cameraPosition.y,cameraPosition.z);
             
              //geometry for grid
             glEnableVertexAttribArray(0);
@@ -330,7 +342,7 @@ int main(int argc, char*argv[])
             glBindVertexArray(vertexArrayObjects[4]);
             glUseProgram(lamp_Shader);
             
-            mat4 WorldView_lamp = projectionMatrix * viewMatrix * modelMatrix * translate(mat4(1.0f),lightpos);
+            mat4 WorldView_lamp = projectionMatrix * viewMatrix * modelMatrix * translate(mat4(1.0f),lightpos) * scale(mat4(1.0f),vec3(3.0f,3.0f,3.0f));
             GLuint lampshader_MVP = glGetUniformLocation(lamp_Shader, "mvp");
             glUniformMatrix4fv(lampshader_MVP, 1, GL_FALSE, &WorldView_lamp[0][0]);
             glDrawArrays(primativeRender, 0, 36);
@@ -343,6 +355,7 @@ int main(int argc, char*argv[])
             glBindVertexArray(vertexArrayObjects[3]);
             glUseProgram(nonTexturedShader);
             
+           
             
             //get the worldview of the olaf within the scene
             mat4 WorldView_Olaf = projectionMatrix * viewMatrix * translateOlaf * scaleOlaf * rotateOlaf;
@@ -350,6 +363,10 @@ int main(int argc, char*argv[])
             //get the mvp of the olaf and the olaf uniform color variable so we can use it to make eyes, buttons, gloves, nose, scarf.
             GLuint modelViewProjection_Olaf = glGetUniformLocation(nonTexturedShader, "mvp");
             GLuint olaf_Color = glGetUniformLocation(nonTexturedShader, "olaf_color");
+            
+             GLuint lightColor = glGetUniformLocation(nonTexturedShader, "lightColor");
+            glUniform3f(lightColor, 1.0f,1.0f,1.0f);
+            
             
             //body
             mat4 olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.f, 3.5f, 0.f))* scale(mat4(1.0f), vec3(1.3f, 1.3f, 1.3f));
@@ -479,14 +496,14 @@ int main(int argc, char*argv[])
             //left glove
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.0f, 4.7f, -2.5f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.3f, -0.3f, -0.3f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-            glUniform3f(olaf_Color, 0.0f,0.0f,0.0f);
+               glUniform3f(olaf_Color, 1.0f,0.0f,0.0f);
             glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             
             //right glove
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.0f, 4.7f, 2.5f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.3f, -0.3f, -0.3f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-            glUniform3f(olaf_Color, 0.0f,0.0f,0.0f);
+               glUniform3f(olaf_Color, 1.0f,0.0f,0.0f);
             glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             
@@ -586,7 +603,17 @@ int main(int argc, char*argv[])
             
             //these are the following keybindings to control the olaf, the camera and the world orientation, textures, lighting and shadows
             
-
+            if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS) // camera zoom in
+                          {
+                              cameraPosition.z -= currentCameraSpeed * dt*40;
+                          }
+                                            
+                      if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) // camera zoom out
+                          {
+                              cameraPosition.z += currentCameraSpeed * dt*40;
+                          }
+            
+            
             
             if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS ) // move camera to the left
                 {
