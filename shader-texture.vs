@@ -20,10 +20,11 @@
 
        void main()
        {
-           gl_Position = mvp * vec4(aPos, 1.0f);
+          
             vertexColor = aPos;
             vertexUV = aUV;
            FragPos = vec3(mvp * vec4(aPos,1.0f));
+            gl_Position = projection * view * vec4(FragPos, 1.0f);
            Normal =aNormal;
        }
         

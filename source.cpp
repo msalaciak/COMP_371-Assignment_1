@@ -202,7 +202,7 @@ int main(int argc, char*argv[])
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
-
+     
 
 
 
@@ -215,6 +215,7 @@ int main(int argc, char*argv[])
     
     // Set projection matrix for shader, this won't change
         mat4 projectionMatrix = mat4(1.0f);
+    
         projectionMatrix = perspective(radians(fovAngle),1024.0f / 768.0f, 0.1f,100.0f);
         mat4 viewMatrix = lookAt(cameraPosition, cameraPosition + cameraLookAt,cameraUp );
         mat4 modelMatrix = mat4(1.0f);
@@ -245,7 +246,8 @@ int main(int argc, char*argv[])
             //setting up the MVP of the world so I can place our objects within
              modelViewProjection = projectionMatrix * viewMatrix * modelMatrix;
             
-        
+            
+            
       
             // set the background color to the greenish grey
             glClearColor(0.2f, 0.29f, 0.29f,1.0f);
@@ -254,21 +256,32 @@ int main(int argc, char*argv[])
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             
             
+            //set world view for nonTexture
             glUseProgram(nonTexturedShader);
-            GLuint lightPosition = glGetUniformLocation(nonTexturedShader, "lightPos");
-            glUniform3f(lightPosition, lightpos.x,lightpos.y,lightpos.z);
-            GLuint viewPosition = glGetUniformLocation(nonTexturedShader, "viewPos");
-            glUniform3f(viewPosition, cameraPosition.x,cameraPosition.y,cameraPosition.z);
+            GLuint view1_noTexture = glGetUniformLocation(nonTexturedShader, "view");
+            GLuint projection2_noTexture = glGetUniformLocation(nonTexturedShader, "projection");
+
+            glUniformMatrix4fv(view1_noTexture, 1, GL_FALSE, &viewMatrix[0][0]);
+            glUniformMatrix4fv(projection2_noTexture, 1, GL_FALSE, &projectionMatrix[0][0]);
+            
+             glUseProgram(textureShader);
+            GLuint view1 = glGetUniformLocation(textureShader, "view");
+            GLuint projection2 = glGetUniformLocation(textureShader, "projection");
+
+                      glUniformMatrix4fv(view1, 1, GL_FALSE, &viewMatrix[0][0]);
+                      glUniformMatrix4fv(projection2, 1, GL_FALSE, &projectionMatrix[0][0]);
+            
+         
             
              //geometry for grid
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[0]);
             //set shader
-            glUseProgram(textureShader);
+            
             //get the MVP of the grid from the shader
             GLuint modelViewProjection_XZ_GRID_Texture = glGetUniformLocation(textureShader, "mvp");
              GLuint gridcolor = glGetUniformLocation(textureShader, "color");
-            
+
             //no texture
             if (!textureOn) {
             glUniform1ui(glGetUniformLocation(textureShader, "textureOn"), 0);
@@ -278,7 +291,7 @@ int main(int argc, char*argv[])
                              {
                                  for(int i=-50; i<=50; ++i)
                                          {
-                                             mat4 grid = modelViewProjection * translate(mat4(1.0f), vec3(i, 0.f, j));
+                                             mat4 grid = translate(mat4(1.0f), vec3(i, 0.f, j));
                                              glUniformMatrix4fv(modelViewProjection_XZ_GRID_Texture, 1, GL_FALSE, &grid[0][0]);
                                              glUniform3f(gridcolor, 0.56f, 0.45f, 0.13f);
                                              glDrawArrays(GL_LINE_LOOP, 0, numOfVerticesGrid);
@@ -294,13 +307,14 @@ int main(int argc, char*argv[])
             GLuint textureLocation = glGetUniformLocation(textureShader, "textureSampler");
             glBindTexture(GL_TEXTURE_2D, snowTextureID);
             glUniform1i(textureLocation, 0);
+
             
             // Draw grid
             for(int j=-50; j<=50; ++j)
                     {
                         for(int i=-50; i<=50; ++i)
                                 {
-                                    mat4 grid = modelViewProjection * translate(mat4(1.0f), vec3(i, 0.f, j));
+                                    mat4 grid = translate(mat4(1.0f), vec3(i, 0.f, j));
                                      glBindTexture(GL_TEXTURE_2D, snowTextureID);
                                     glUniformMatrix4fv(modelViewProjection_XZ_GRID_Texture, 1, GL_FALSE, &grid[0][0]);
                                     glDrawArrays(GL_TRIANGLES, 0, numOfVerticesGrid);
@@ -355,14 +369,26 @@ int main(int argc, char*argv[])
             glBindVertexArray(vertexArrayObjects[3]);
             glUseProgram(nonTexturedShader);
             
-           
             
+            
+           GLuint lightPosition = glGetUniformLocation(nonTexturedShader, "lightPos");
+           glUniform3f(lightPosition, lightpos.x,lightpos.y,lightpos.z);
+            GLuint viewPosition = glGetUniformLocation(nonTexturedShader, "viewPos");
+                     
+            glUniform3f(viewPosition, cameraPosition.x,cameraPosition.y,cameraPosition.z);
+         
+            glFrontFace(GL_CW);
+
             //get the worldview of the olaf within the scene
-            mat4 WorldView_Olaf = projectionMatrix * viewMatrix * translateOlaf * scaleOlaf * rotateOlaf;
+            mat4 WorldView_Olaf =  translateOlaf  * rotateOlaf * scaleOlaf;
+            
+            
             
             //get the mvp of the olaf and the olaf uniform color variable so we can use it to make eyes, buttons, gloves, nose, scarf.
             GLuint modelViewProjection_Olaf = glGetUniformLocation(nonTexturedShader, "mvp");
             GLuint olaf_Color = glGetUniformLocation(nonTexturedShader, "olaf_color");
+            
+          
             
              GLuint lightColor = glGetUniformLocation(nonTexturedShader, "lightColor");
             glUniform3f(lightColor, 1.0f,1.0f,1.0f);
@@ -387,10 +413,11 @@ int main(int argc, char*argv[])
             glUniform3f(olaf_Color, 1.0f,1.0f,1.0f);
             glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
+            
             //switch back to cube vertices
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[2]);
-            glUseProgram(nonTexturedShader);
+       
             
             //right leg
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 1.3f, -0.5f)) * scale(mat4(1.0f), vec3(1.0f, 2.5f, -0.4f));
@@ -437,6 +464,7 @@ int main(int argc, char*argv[])
             glBindTexture(GL_TEXTURE_2D, carrotTextureID);
             glUniform1i(textureLocation, 0);
             GLuint modelViewProjection_Olaf_Texture = glGetUniformLocation(textureShader, "mvp");
+        
             
             
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.896f, 5.9f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.35f, -0.1f));
@@ -449,7 +477,7 @@ int main(int argc, char*argv[])
             glBindVertexArray(vertexArrayObjects[3]);
             glUseProgram(nonTexturedShader);
                        
-            
+             glFrontFace(GL_CW);
             //left eye
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.696f, 6.05f, -0.2f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.01f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
@@ -493,6 +521,7 @@ int main(int argc, char*argv[])
             glUniform3f(olaf_Color, 0.39f,0.26f,0.13f);
             glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
+            
             //left glove
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.0f, 4.7f, -2.5f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.3f, -0.3f, -0.3f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
@@ -509,19 +538,19 @@ int main(int argc, char*argv[])
             
             
             //scarf
-//            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.0f, 5.45f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.15f, 1.0f, 0.8f));
-//            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-//            glUniform3f(olaf_Color, 1.0f,0.0f,0.0f);
-//            glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.0f, 5.45f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.15f, 1.0f, 0.8f));
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniform3f(olaf_Color, 1.0f,0.0f,0.0f);
+            glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             
 
             
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[2]);
-            glUseProgram(nonTexturedShader);
+         
             
-            
+            glFrontFace(GL_CCW);
             
             //hat brim
             if(!textureOn) {
@@ -559,6 +588,8 @@ int main(int argc, char*argv[])
             glDrawArrays(primativeRender, 0, 36);
             
             }
+            
+
 
             // End Frame
             glfwSwapBuffers(window);
@@ -606,6 +637,7 @@ int main(int argc, char*argv[])
             if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS) // camera zoom in
                           {
                               cameraPosition.z -= currentCameraSpeed * dt*40;
+                              
                           }
                                             
                       if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) // camera zoom out
@@ -618,6 +650,7 @@ int main(int argc, char*argv[])
             if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS ) // move camera to the left
                 {
                     cameraPosition.x -= currentCameraSpeed * dt*40;
+                    
                 }
 
             if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) // move camera to the right
@@ -787,7 +820,10 @@ int main(int argc, char*argv[])
                 x+=0.01;
                 y+=0.01;
                 z+=0.01;
-                modelMatrix = modelMatrix * rotate(mat4(1.0f), radians(x),vec3(1.0f,0.f, 0.f));
+                viewMatrix = viewMatrix * rotate(mat4(1.0f), radians(x),vec3(1.0f,0.f, 0.f));
+                projectionMatrix = projectionMatrix * rotate(mat4(1.0f), radians(x),vec3(1.0f,0.f, 0.f));
+
+                               
                      }
             
             if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) // rotate X axis in the other orientation of the world
@@ -799,8 +835,13 @@ int main(int argc, char*argv[])
                 x+=0.01;
                 y+=0.01;
                 z+=0.01;
-                modelMatrix = modelMatrix * rotate(mat4(1.0f), radians(x),vec3(-1.0f,0.f, 0.f));
+                viewMatrix = viewMatrix * rotate(mat4(1.0f), radians(x),vec3(-1.0f,0.f, 0.f));
+                             
+                projectionMatrix = projectionMatrix * rotate(mat4(1.0f), radians(x),vec3(-1.0f,0.f, 0.f));
+
+                                     
                              }
+                                        
             
             
             

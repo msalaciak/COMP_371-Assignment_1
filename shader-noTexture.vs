@@ -9,6 +9,7 @@
 
         layout (location = 0) in vec3 aPos;
         layout (location = 1) in vec3 aNormal;
+        layout (location = 2) in vec2 aUV;
         
        uniform mat4 mvp;
        uniform mat4 model;
@@ -21,9 +22,13 @@
 
        void main()
        {
-           gl_Position = mvp * vec4(aPos, 1.0f);
+
+           
+           
+           Normal = mat3(transpose(inverse(mvp))) * aNormal;
            vertexColor = color;
            FragPos = vec3(mvp * vec4(aPos, 1.0f));
+           gl_Position = projection * view * vec4(FragPos, 1.0f);
            
-           Normal = mat3(transpose(inverse(model))) * aNormal;
+          
        }
