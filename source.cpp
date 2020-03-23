@@ -271,6 +271,14 @@ int main(int argc, char*argv[])
                       glUniformMatrix4fv(view1, 1, GL_FALSE, &viewMatrix[0][0]);
                       glUniformMatrix4fv(projection2, 1, GL_FALSE, &projectionMatrix[0][0]);
             
+            
+            
+            GLuint lightPositionTexture = glGetUniformLocation(textureShader, "lightPos");
+            glUniform3f(lightPositionTexture, lightpos.x,lightpos.y,lightpos.z);
+             GLuint viewPositionTexture = glGetUniformLocation(textureShader, "viewPos");
+                      
+             glUniform3f(viewPositionTexture, cameraPosition.x,cameraPosition.y,cameraPosition.z);
+            
          
             
              //geometry for grid
@@ -285,6 +293,7 @@ int main(int argc, char*argv[])
             //no texture
             if (!textureOn) {
             glUniform1ui(glGetUniformLocation(textureShader, "textureOn"), 0);
+            
 
             // Draw grid
                      for(int j=-50; j<=50; ++j)

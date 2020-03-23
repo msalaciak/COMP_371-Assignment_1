@@ -20,11 +20,11 @@
 
        void main()
        {
-          
+            Normal = mat3(transpose(inverse(mvp))) * aNormal;
             vertexColor = aPos;
             vertexUV = aUV;
            FragPos = vec3(mvp * vec4(aPos,1.0f));
             gl_Position = projection * view * vec4(FragPos, 1.0f);
-           Normal =aNormal;
+    
        }
         
