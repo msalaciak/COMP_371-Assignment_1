@@ -133,9 +133,9 @@ int main(int argc, char*argv[])
         // Define and upload geometry to the GPU here by creating a VAO and VBO that has the size of 3
         // This way we can store of the geometry of all three objects at different indices.
     
-          GLuint vertexArrayObjects[5], vertexBufferObjects[5];
-          glGenVertexArrays(5, vertexArrayObjects);
-          glGenBuffers(5, vertexBufferObjects);
+          GLuint vertexArrayObjects[6], vertexBufferObjects[6];
+          glGenVertexArrays(6, vertexArrayObjects);
+          glGenBuffers(6, vertexBufferObjects);
           
           //bind grid vertices
           glBindVertexArray(vertexArrayObjects[0]);
@@ -144,8 +144,12 @@ int main(int argc, char*argv[])
           glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(grid), (void*)0);
           glEnableVertexAttribArray(0);
     
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(grid), (void*)sizeof(vec3));
+        glEnableVertexAttribArray(1);
+    
           glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(grid), (void*)(2*sizeof(vec3)));
           glEnableVertexAttribArray(2);
+    
     
           
           //bind xyz vertices
@@ -192,6 +196,19 @@ int main(int argc, char*argv[])
          glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(lamp), (void*)sizeof(vec3));
          glEnableVertexAttribArray(1);
     
+    
+       //bind grid vertices notexture
+          glBindVertexArray(vertexArrayObjects[5]);
+          glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjects[5]);
+          glBufferData(GL_ARRAY_BUFFER, sizeof(grid_vertices_noTexture), grid_vertices_noTexture, GL_STATIC_DRAW);
+          glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(gridNoTexture), (void*)0);
+          glEnableVertexAttribArray(0);
+    
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(gridNoTexture), (void*)sizeof(vec3));
+        glEnableVertexAttribArray(1);
+    
+          glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(gridNoTexture), (void*)(2*sizeof(vec3)));
+          glEnableVertexAttribArray(2);
       
 
 
@@ -268,30 +285,33 @@ int main(int argc, char*argv[])
             GLuint view1 = glGetUniformLocation(textureShader, "view");
             GLuint projection2 = glGetUniformLocation(textureShader, "projection");
 
-                      glUniformMatrix4fv(view1, 1, GL_FALSE, &viewMatrix[0][0]);
-                      glUniformMatrix4fv(projection2, 1, GL_FALSE, &projectionMatrix[0][0]);
+            glUniformMatrix4fv(view1, 1, GL_FALSE, &viewMatrix[0][0]);
+            glUniformMatrix4fv(projection2, 1, GL_FALSE, &projectionMatrix[0][0]);
             
             
             
             GLuint lightPositionTexture = glGetUniformLocation(textureShader, "lightPos");
-            glUniform3f(lightPositionTexture, lightpos.x,lightpos.y,lightpos.z);
              GLuint viewPositionTexture = glGetUniformLocation(textureShader, "viewPos");
+            glUniform3f(lightPositionTexture, lightpos.x,lightpos.y,lightpos.z);
+            glUniform3f(viewPositionTexture, cameraPosition.x,cameraPosition.y,cameraPosition.z);
+
                       
-             glUniform3f(viewPositionTexture, cameraPosition.x,cameraPosition.y,cameraPosition.z);
-            
          
             
              //geometry for grid
-            glEnableVertexAttribArray(0);
-            glBindVertexArray(vertexArrayObjects[0]);
+           
             //set shader
             
             //get the MVP of the grid from the shader
             GLuint modelViewProjection_XZ_GRID_Texture = glGetUniformLocation(textureShader, "mvp");
              GLuint gridcolor = glGetUniformLocation(textureShader, "color");
+            GLuint lightColor = glGetUniformLocation(textureShader, "lightColor");
+            glUniform3f(lightColor, 1.0f,1.0f,1.0f);
 
             //no texture
             if (!textureOn) {
+            glEnableVertexAttribArray(0);
+            glBindVertexArray(vertexArrayObjects[5]);
             glUniform1ui(glGetUniformLocation(textureShader, "textureOn"), 0);
             
 
@@ -310,7 +330,8 @@ int main(int argc, char*argv[])
             
             //texture
             if (textureOn) {
-         
+         glEnableVertexAttribArray(0);
+        glBindVertexArray(vertexArrayObjects[0]);
             glUniform1i(glGetUniformLocation(textureShader, "textureOn"), 1);
             glActiveTexture(GL_TEXTURE0);
             GLuint textureLocation = glGetUniformLocation(textureShader, "textureSampler");
@@ -399,8 +420,8 @@ int main(int argc, char*argv[])
             
           
             
-             GLuint lightColor = glGetUniformLocation(nonTexturedShader, "lightColor");
-            glUniform3f(lightColor, 1.0f,1.0f,1.0f);
+             GLuint lightColorNonTexture = glGetUniformLocation(nonTexturedShader, "lightColor");
+            glUniform3f(lightColorNonTexture, 1.0f,1.0f,1.0f);
             
             
             //body
@@ -457,9 +478,17 @@ int main(int argc, char*argv[])
             
             //nose
             if (!textureOn) {
+            
+            glUseProgram(textureShader);
+            GLuint olaf_Color_noTexture = glGetUniformLocation(textureShader, "color");
+            glUniform3f(viewPositionTexture, cameraPosition.x,cameraPosition.y,cameraPosition.z);
+            GLuint modelViewProjection_Olaf_Texture = glGetUniformLocation(textureShader, "mvp");
+                
+            
+            
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.896f, 5.9f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.35f, -0.1f));
-            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-            glUniform3f(olaf_Color, 1.0f,0.64f,0.0f);
+            glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniform3f(olaf_Color_noTexture, 1.0f,0.64f,0.0f);
             glDrawArrays(primativeRender, 0, 36);
             }
             
@@ -563,21 +592,28 @@ int main(int argc, char*argv[])
             
             //hat brim
             if(!textureOn) {
+            glUseProgram(textureShader);
+            GLuint olaf_Color_noTexture = glGetUniformLocation(textureShader, "color");
+            glUniform3f(viewPositionTexture, cameraPosition.x,cameraPosition.y,cameraPosition.z);
+            GLuint modelViewProjection_Olaf_Texture = glGetUniformLocation(textureShader, "mvp");
+
+                
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.50f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.1f, 1.2f, 1.75f));
-            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-             glUniform3f(olaf_Color, 0.0f,0.0f,0.0f);
+            glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniform3f(olaf_Color_noTexture, 0.0f,0.0f,0.0f);
             glDrawArrays(primativeRender, 0, 36);
 
             //hat top
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.70f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.7f, 1.2f, 1.4f));
-            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
-                  glUniform3f(olaf_Color, 0.0f,0.0f,0.0f);
+            glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniform3f(olaf_Color_noTexture, 0.0f,0.0f,0.0f);
             glDrawArrays(primativeRender, 0, 36);
             }
             
             //texture hat brim
             if (textureOn) {
             glUseProgram(textureShader);
+                                     glUniform3f(viewPositionTexture, cameraPosition.x,cameraPosition.y,cameraPosition.z);
             glActiveTexture(GL_TEXTURE0);
             GLuint textureLocation = glGetUniformLocation(textureShader, "textureSampler");
             glBindTexture(GL_TEXTURE_2D, shinyMetalTextureID);
