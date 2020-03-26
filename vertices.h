@@ -130,63 +130,109 @@ struct snowman
 static const snowman snowman_vertices [] = {  // position,
 
     
-      snowman(vec3 (-0.5f, -0.5f, 0.5f), vec3(0.0f, 0.0f, 1.0f), vec2(0.0f, 0.0f)),
-      snowman(vec3 (0.5f, -0.5f, 0.5f),  vec3(0.0f, 0.0f, 1.0f), vec2(1.0f, 0.0f)),
-      snowman(vec3 ( 0.5f, 0.5f, 0.5f), vec3( 0.0f, 0.0f, 1.0f), vec2(1.0f, 1.0f)),
+//      snowman(vec3 (-0.5f, -0.5f, 0.5f), vec3(0.0f, 0.0f, 1.0f), vec2(0.0f, 0.0f)),
+//      snowman(vec3 (0.5f, -0.5f, 0.5f),  vec3(0.0f, 0.0f, 1.0f), vec2(1.0f, 0.0f)),
+//      snowman(vec3 ( 0.5f, 0.5f, 0.5f), vec3( 0.0f, 0.0f, 1.0f), vec2(1.0f, 1.0f)),
+//
+//      snowman(vec3 (-0.5f, -0.5f, 0.5f), vec3(0.0f, 0.0f, 1.0f), vec2(0.0f, 0.0f)),
+//      snowman(vec3 ( 0.5f, 0.5f, 0.5f), vec3( 0.0f, 0.0f, 1.0f), vec2(1.0f, 1.0f)),
+//      snowman(vec3 ( -0.5f, 0.5f, 0.5f),  vec3(0.0f, 0.0f, 1.0f), vec2(0.0f, 1.0f)),
+//
+//      snowman(vec3 (0.5f, 0.5f, -0.5f), vec3( 1.0f, 0.0f, 0.0f), vec2(1.0f, 0.0f)),
+//      snowman(vec3 ( 0.5f, 0.5f, 0.5f),  vec3(1.0f, 0.0f, 0.0f), vec2(0.0f, 0.0f)),
+//      snowman(vec3 ( 0.5f, -0.5f, 0.5f),  vec3(1.0f, 0.0f, 0.0f), vec2(0.0f, 1.0f)),
+//
+//      snowman(vec3 (0.5f, 0.5f, -0.5f), vec3( 1.0f, 0.0f, 0.0f), vec2(1.0f, 0.0f)),
+//      snowman(vec3 ( 0.5f, -0.5f, 0.5f),  vec3(1.0f, 0.0f, 0.0f), vec2(0.0f, 1.0f)),
+//      snowman(vec3 (0.5f, -0.5f, -0.5f), vec3( 1.0f, 0.0f, 0.0f), vec2(1.0f, 1.0f)),
+//
+//
+//      snowman(vec3 ( -0.5f, -0.5f, 0.5f),  vec3(-1.0f, 0.0f, 0.0f), vec2(0.0f, 1.0f)),
+//      snowman(vec3 (-0.5f, 0.5f, 0.5f),  vec3(-1.0f, 0.0f, 0.0f),vec2( 0.0f, 0.0f)),
+//      snowman(vec3 (-0.5f, 0.5f, -0.5f), vec3( -1.0f, 0.0f, 0.0f),vec2( 1.0f, 0.0f)),
+//
+//
+//      snowman(vec3 ( -0.5f, -0.5f, 0.5f),  vec3(-1.0f, 0.0f, 0.0f), vec2(0.0f, 1.0f)),
+//    snowman(vec3 (-0.5f, 0.5f, -0.5f), vec3( -1.0f, 0.0f, 0.0f),vec2( 1.0f, 0.0f)),
+//       snowman(vec3 (-0.5f, -0.5f, -0.5f), vec3( -1.0f, 0.0f, 0.0f), vec2(1.0f, 1.0f)),
+//
+//      snowman(vec3 ( -0.5f, -0.5f, -0.5f), vec3(0.0f, 0.0f, -1.0f), vec2(0.0f, 0.0f)),
+//      snowman(vec3 ( -0.5f, 0.5f, -0.5f), vec3( 0.0f, 0.0f, -1.0f), vec2(0.0f, 1.0f)),
+//      snowman(vec3 ( 0.5f, 0.5f, -0.5f),  vec3(0.0f, 0.0f, -1.0f),vec2( 1.0f, 1.0f)),
+//
+//      snowman(vec3 ( -0.5f, -0.5f, -0.5f), vec3(0.0f, 0.0f, -1.0f), vec2(0.0f, 0.0f)),
+//      snowman(vec3 ( 0.5f, 0.5f, -0.5f),  vec3(0.0f, 0.0f, -1.0f),vec2( 1.0f, 1.0f)),
+//      snowman(vec3 ( 0.5f, -0.5f, -0.5f), vec3( 0.0f, 0.0f, -1.0f), vec2(1.0f, 0.0f)),
+//
+//
+//
+//      snowman(vec3 ( -0.5f, 0.5f, 0.5f),  vec3(0.0f, 1.0f, 0.0f),vec2( 0.0f, 0.0f)),
+//      snowman(vec3 ( 0.5f, 0.5f, 0.5f),  vec3(0.0f, 1.0f, 0.0f), vec2(1.0f, 0.0f)),
+//       snowman(vec3 (0.5f, 0.5f, -0.5f),  vec3(0.0f, 1.0f, 0.0f), vec2(1.0f, 1.0f)),
+//
+//
+//
+//      snowman(vec3 ( -0.5f, 0.5f, 0.5f),  vec3(0.0f, 1.0f, 0.0f),vec2( 0.0f, 0.0f)),
+//       snowman(vec3 (0.5f, 0.5f, -0.5f),  vec3(0.0f, 1.0f, 0.0f), vec2(1.0f, 1.0f)),
+//    snowman(vec3 ( -0.5f, 0.5f, -0.5f),  vec3(0.0f, 1.0f, 0.0f), vec2(0.0f, 1.0f)),
+//
+//
+//      snowman(vec3 ( -0.5f, -0.5f, -0.5f), vec3( 0.0f, -1.0f, 0.0f), vec2(0.0f, 1.0f)),
+//      snowman(vec3 ( 0.5f, -0.5f, -0.5f),  vec3(0.0f, -1.0f, 0.0f), vec2(1.0f, 1.0f)),
+//      snowman(vec3 ( 0.5f, -0.5f, 0.5f),  vec3(0.0f, -1.0f, 0.0f), vec2(1.0f, 0.0f)),
+//
+//
+//
+//      snowman(vec3 ( -0.5f, -0.5f, -0.5f), vec3( 0.0f, -1.0f, 0.0f), vec2(0.0f, 1.0f)),
+//      snowman(vec3 ( 0.5f, -0.5f, 0.5f),  vec3(0.0f, -1.0f, 0.0f), vec2(1.0f, 0.0f)),
+//      snowman(vec3 ( -0.5f, -0.5f, 0.5f), vec3( 0.0f, -1.0f, 0.0f), vec2(0.0f, 0.0f))
 
-      snowman(vec3 (-0.5f, -0.5f, 0.5f), vec3(0.0f, 0.0f, 1.0f), vec2(0.0f, 0.0f)),
-      snowman(vec3 ( 0.5f, 0.5f, 0.5f), vec3( 0.0f, 0.0f, 1.0f), vec2(1.0f, 1.0f)),
-      snowman(vec3 ( -0.5f, 0.5f, 0.5f),  vec3(0.0f, 0.0f, 1.0f), vec2(0.0f, 1.0f)),
+    
+               snowman(vec3 ( -0.5f, -0.5f, -0.5f), vec3(0.0f,  0.0f, -1.0f), vec2( 0.0f, 0.0f)), // bottom-left
+             snowman(vec3 (  0.5f,  0.5f, -0.5f), vec3(0.0f,  0.0f, -1.0f), vec2( 1.0f, 1.0f)), // top-right
+             snowman(vec3 (  0.5f, -0.5f, -0.5f  ), vec3(0.0f,  0.0f, -1.0f), vec2( 1.0f, 0.0f)), // bottom-right
+             snowman(vec3 (  0.5f,  0.5f, -0.5f ), vec3( 0.0f,  0.0f, -1.0f), vec2( 1.0f, 1.0f)), // top-right
+            snowman(vec3 (  -0.5f, -0.5f, -0.5f  ), vec3(0.0f,  0.0f, -1.0f), vec2( 0.0f, 0.0f)), // bottom-left
+            snowman(vec3 (  -0.5f,  0.5f, -0.5f), vec3( 0.0f,  0.0f, -1.0f), vec2( 0.0f, 1.0f)), // top-left
+             // front face
+           snowman(vec3 (   -0.5f, -0.5f,  0.5f), vec3(  0.0f,  0.0f,  1.0f), vec2( 0.0f, 0.0f)), // bottom-left
+           snowman(vec3 (    0.5f, -0.5f,  0.5f), vec3(  0.0f,  0.0f,  1.0f), vec2( 1.0f, 0.0f)), // bottom-right
+           snowman(vec3 (    0.5f,  0.5f,  0.5f), vec3(  0.0f,  0.0f,  1.0f), vec2( 1.0f, 1.0f)), // top-right
+           snowman(vec3 (    0.5f,  0.5f,  0.5f), vec3(  0.0f,  0.0f,  1.0f), vec2( 1.0f, 1.0f)), // top-right
+           snowman(vec3 (   -0.5f,  0.5f,  0.5f), vec3(  0.0f,  0.0f,  1.0f), vec2( 0.0f, 1.0f)), // top-left
+           snowman(vec3 (   -0.5f, -0.5f,  0.5f), vec3(  0.0f,  0.0f,  1.0f), vec2(0.0f, 0.0f)), // bottom-left
+             // left face
+           snowman(vec3 (   -0.5f,  0.5f,  0.5f), vec3( -1.0f,  0.0f,  0.0f), vec2( 1.0f, 0.0f)), // top-right
+           snowman(vec3 (   -0.5f,  0.5f, -0.5f), vec3( -1.0f,  0.0f,  0.0f), vec2( 1.0f, 1.0f)), // top-left
+           snowman(vec3 (   -0.5f, -0.5f, -0.5f), vec3( -1.0f,  0.0f,  0.0f), vec2( 0.0f, 1.0f)), // bottom-left
+           snowman(vec3 (   -0.5f, -0.5f, -0.5f), vec3( -1.0f,  0.0f,  0.0f), vec2( 0.0f, 1.0f)), // bottom-left
+           snowman(vec3 (   -0.5f, -0.5f,  0.5f), vec3( -1.0f,  0.0f,  0.0f), vec2( 0.0f, 0.0f)), // bottom-right
+           snowman(vec3 (   -0.5f,  0.5f,  0.5f), vec3( -1.0f,  0.0f,  0.0f), vec2( 1.0f, 0.0f)), // top-right
+             // right face
+           snowman(vec3 (    0.5f,  0.5f,  0.5f), vec3(  1.0f,  0.0f,  0.0f), vec2( 1.0f, 0.0f)), // top-left
+          snowman(vec3 (     0.5f, -0.5f, -0.5f), vec3(  1.0f,  0.0f,  0.0f), vec2( 0.0f, 1.0f)), // bottom-right
+          snowman(vec3 (     0.5f,  0.5f, -0.5f), vec3(  1.0f,  0.0f,  0.0f), vec2( 1.0f, 1.0f)), // top-right
+          snowman(vec3 (     0.5f, -0.5f, -0.5f), vec3(  1.0f,  0.0f,  0.0f), vec2( 0.0f, 1.0f)), // bottom-right
+          snowman(vec3 (     0.5f,  0.5f,  0.5f), vec3(  1.0f,  0.0f,  0.0f), vec2( 1.0f, 0.0f)), // top-left
+          snowman(vec3 (     0.5f, -0.5f,  0.5f), vec3(  1.0f,  0.0f,  0.0f), vec2( 0.0f, 0.0f)), // bottom-left
+             // bottom face
+         snowman(vec3 (     -0.5f, -0.5f, -0.5f), vec3(  0.0f, -1.0f,  0.0f), vec2( 0.0f, 1.0f)), // top-right
+         snowman(vec3 (      0.5f, -0.5f, -0.5f), vec3(  0.0f, -1.0f,  0.0f), vec2( 1.0f, 1.0f)), // top-left
+         snowman(vec3 (      0.5f, -0.5f,  0.5f), vec3(  0.0f, -1.0f,  0.0f), vec2( 1.0f, 0.0f)), // bottom-left
+         snowman(vec3 (      0.5f, -0.5f,  0.5f), vec3(  0.0f, -1.0f,  0.0f), vec2( 1.0f, 0.0f)), // bottom-left
+         snowman(vec3 (     -0.5f, -0.5f,  0.5f), vec3(  0.0f, -1.0f,  0.0f), vec2( 0.0f, 0.0f)), // bottom-right
+        snowman(vec3 (      -0.5f, -0.5f, -0.5f), vec3(  0.0f, -1.0f,  0.0f), vec2( 0.0f, 1.0f)), // top-right
+             // top face
+        snowman(vec3 (      -0.5f,  0.5f, -0.5f), vec3(  0.0f,  1.0f,  0.0f), vec2( 0.0f, 1.0f)), // top-left
+         snowman(vec3 (      0.5f,  0.5f , 0.5f), vec3(  0.0f,  1.0f,  0.0f), vec2( 1.0f, 0.0f)), // bottom-right))
+         snowman(vec3 (      0.5f,  0.5f, -0.5f), vec3(  0.0f,  1.0f,  0.0f), vec2( 1.0f, 1.0f)), // top-right
+        snowman(vec3 (       0.5f,  0.5f,  0.5f), vec3(  0.0f,  1.0f,  0.0f), vec2( 1.0f, 0.0f)), // bottom-right
+        snowman(vec3 (      -0.5f,  0.5f, -0.5f), vec3(  0.0f,  1.0f,  0.0f), vec2( 0.0f, 1.0f)), // top-left
+        snowman(vec3 (      -0.5f,  0.5f,  0.5f), vec3(  0.0f,  1.0f,  0.0f), vec2( 0.0f, 0.0f )) // bottom-lef
 
-      snowman(vec3 (0.5f, 0.5f, -0.5f), vec3( 1.0f, 0.0f, 0.0f), vec2(1.0f, 0.0f)),
-      snowman(vec3 ( 0.5f, 0.5f, 0.5f),  vec3(1.0f, 0.0f, 0.0f), vec2(0.0f, 0.0f)),
-      snowman(vec3 ( 0.5f, -0.5f, 0.5f),  vec3(1.0f, 0.0f, 0.0f), vec2(0.0f, 1.0f)),
-
-      snowman(vec3 (0.5f, 0.5f, -0.5f), vec3( 1.0f, 0.0f, 0.0f), vec2(1.0f, 0.0f)),
-      snowman(vec3 ( 0.5f, -0.5f, 0.5f),  vec3(1.0f, 0.0f, 0.0f), vec2(0.0f, 1.0f)),
-      snowman(vec3 (0.5f, -0.5f, -0.5f), vec3( 1.0f, 0.0f, 0.0f), vec2(1.0f, 1.0f)),
-
-
-      snowman(vec3 ( -0.5f, -0.5f, 0.5f),  vec3(-1.0f, 0.0f, 0.0f), vec2(0.0f, 1.0f)),
-      snowman(vec3 (-0.5f, 0.5f, 0.5f),  vec3(-1.0f, 0.0f, 0.0f),vec2( 0.0f, 0.0f)),
-      snowman(vec3 (-0.5f, 0.5f, -0.5f), vec3( -1.0f, 0.0f, 0.0f),vec2( 1.0f, 0.0f)),
-
-
-      snowman(vec3 ( -0.5f, -0.5f, 0.5f),  vec3(-1.0f, 0.0f, 0.0f), vec2(0.0f, 1.0f)),
-    snowman(vec3 (-0.5f, 0.5f, -0.5f), vec3( -1.0f, 0.0f, 0.0f),vec2( 1.0f, 0.0f)),
-       snowman(vec3 (-0.5f, -0.5f, -0.5f), vec3( -1.0f, 0.0f, 0.0f), vec2(1.0f, 1.0f)),
-
-      snowman(vec3 ( -0.5f, -0.5f, -0.5f), vec3(0.0f, 0.0f, -1.0f), vec2(0.0f, 0.0f)),
-      snowman(vec3 ( -0.5f, 0.5f, -0.5f), vec3( 0.0f, 0.0f, -1.0f), vec2(0.0f, 1.0f)),
-      snowman(vec3 ( 0.5f, 0.5f, -0.5f),  vec3(0.0f, 0.0f, -1.0f),vec2( 1.0f, 1.0f)),
-
-      snowman(vec3 ( -0.5f, -0.5f, -0.5f), vec3(0.0f, 0.0f, -1.0f), vec2(0.0f, 0.0f)),
-      snowman(vec3 ( 0.5f, 0.5f, -0.5f),  vec3(0.0f, 0.0f, -1.0f),vec2( 1.0f, 1.0f)),
-      snowman(vec3 ( 0.5f, -0.5f, -0.5f), vec3( 0.0f, 0.0f, -1.0f), vec2(1.0f, 0.0f)),
-
-
-
-      snowman(vec3 ( -0.5f, 0.5f, 0.5f),  vec3(0.0f, 1.0f, 0.0f),vec2( 0.0f, 0.0f)),
-      snowman(vec3 ( 0.5f, 0.5f, 0.5f),  vec3(0.0f, 1.0f, 0.0f), vec2(1.0f, 0.0f)),
-       snowman(vec3 (0.5f, 0.5f, -0.5f),  vec3(0.0f, 1.0f, 0.0f), vec2(1.0f, 1.0f)),
-
-
-
-      snowman(vec3 ( -0.5f, 0.5f, 0.5f),  vec3(0.0f, 1.0f, 0.0f),vec2( 0.0f, 0.0f)),
-       snowman(vec3 (0.5f, 0.5f, -0.5f),  vec3(0.0f, 1.0f, 0.0f), vec2(1.0f, 1.0f)),
-    snowman(vec3 ( -0.5f, 0.5f, -0.5f),  vec3(0.0f, 1.0f, 0.0f), vec2(0.0f, 1.0f)),
-
-
-      snowman(vec3 ( -0.5f, -0.5f, -0.5f), vec3( 0.0f, -1.0f, 0.0f), vec2(0.0f, 1.0f)),
-      snowman(vec3 ( 0.5f, -0.5f, -0.5f),  vec3(0.0f, -1.0f, 0.0f), vec2(1.0f, 1.0f)),
-      snowman(vec3 ( 0.5f, -0.5f, 0.5f),  vec3(0.0f, -1.0f, 0.0f), vec2(1.0f, 0.0f)),
-
-
-
-      snowman(vec3 ( -0.5f, -0.5f, -0.5f), vec3( 0.0f, -1.0f, 0.0f), vec2(0.0f, 1.0f)),
-      snowman(vec3 ( 0.5f, -0.5f, 0.5f),  vec3(0.0f, -1.0f, 0.0f), vec2(1.0f, 0.0f)),
-      snowman(vec3 ( -0.5f, -0.5f, 0.5f), vec3( 0.0f, -1.0f, 0.0f), vec2(0.0f, 0.0f))
-
+    
+    
+    
     
     
 };
