@@ -242,6 +242,11 @@ int main(int argc, char*argv[])
             float cameraFastSpeed = 2 * cameraSpeed;
             float cameraHorizontalAngle = 90.0f;
             float cameraVerticalAngle = 0.0f;
+    
+    
+    
+
+    
 
         
         // Entering Main Loop
@@ -263,50 +268,18 @@ int main(int argc, char*argv[])
             // clear the color and depth buffer at the beginning of each loop
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             
-            //geometry for the XYZ coord
-                  
-                      glEnableVertexAttribArray(0);
-                      glBindVertexArray(vertexArrayObjects[1]);
-                      glUseProgram(XYZ_Shader);
-                            
-                      //get the MVP of the XYZ from the shader, get the color uniform variable so we can set each line to its own color
-                      GLuint modelViewProjection_XYZ = glGetUniformLocation(XYZ_Shader, "mvp");
-                      GLuint XYZ_color = glGetUniformLocation(XYZ_Shader, "xyz_color");
-                      //create the MVP of the camera to be placed within the world
-                      mat4 camera_ModelViewProject_XYZ =  projectionMatrix * viewMatrix * modelMatrix;
-                      glUniformMatrix4fv(modelViewProjection_XYZ, 1, GL_FALSE, &camera_ModelViewProject_XYZ[0][0]);
+          
 
-                      //quick for loop to draw the 3 lines, and takes its colors from the XYZ colors array which is stored in the vertices header
-                      int XYZ_vertexIndex =0;
-                      for(int i =0; i<3;i++) {
-                          glUniform3f(XYZ_color, XYZ_Colors[i].x,XYZ_Colors[i].y,XYZ_Colors[i].z);
-                          glDrawArrays(GL_LINES, XYZ_vertexIndex, 2);
-                          XYZ_vertexIndex = XYZ_vertexIndex +2;
-                                }
-
-                      //lamp (light source)
-                      glEnableVertexAttribArray(0);
-                      glBindVertexArray(vertexArrayObjects[4]);
-                      glUseProgram(lamp_Shader);
-                      
-                      mat4 WorldView_lamp = projectionMatrix * viewMatrix * modelMatrix * translate(mat4(1.0f),lightpos) * scale(mat4(1.0f),vec3(3.0f,3.0f,3.0f));
-                      GLuint lampshader_MVP = glGetUniformLocation(lamp_Shader, "mvp");
-                      glUniformMatrix4fv(lampshader_MVP, 1, GL_FALSE, &WorldView_lamp[0][0]);
-                      glDrawArrays(primativeRender, 0, 36);
-                      
-            
-            
-            
-      
 
             //texture shader
             glUseProgram(textureShader);
+            
+            //set view and projection materix in shader
             GLuint viewMatrix_texture = glGetUniformLocation(textureShader, "view");
             GLuint projectionMatrix_texture = glGetUniformLocation(textureShader, "projection");
-
             glUniformMatrix4fv(viewMatrix_texture, 1, GL_FALSE, &viewMatrix[0][0]);
             glUniformMatrix4fv(projectionMatrix_texture, 1, GL_FALSE, &projectionMatrix[0][0]);
-            
+ 
             
             //set light and view position
             GLuint lightPositionTexture = glGetUniformLocation(textureShader, "lightPos");
@@ -317,13 +290,15 @@ int main(int argc, char*argv[])
             //set lightColor for textureShader
             GLuint lightColor = glGetUniformLocation(textureShader, "lightColor");
             glUniform3f(lightColor, 1.0f,1.0f,1.0f);
+            
+            //texture location and activation
+            GLuint textureLocation = glGetUniformLocation(textureShader, "textureSampler");
+             glUniform1i(textureLocation, 0);
+            glActiveTexture(GL_TEXTURE0);
 
                       
-            
-             //geometry for grid
-           
-            //set shader
-            
+
+
           //get the MVP of the grid from the shader
             
             GLuint modelViewProjection_XZ_GRID_Texture = glGetUniformLocation(textureShader, "mvp");
@@ -356,10 +331,8 @@ int main(int argc, char*argv[])
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[0]);
             glUniform1i(glGetUniformLocation(textureShader, "textureOn"), 1);
-            glActiveTexture(GL_TEXTURE0);
-            GLuint textureLocation = glGetUniformLocation(textureShader, "textureSampler");
             glBindTexture(GL_TEXTURE_2D, snowTextureID);
-            glUniform1i(textureLocation, 0);
+
 
             // Draw grid
             for(int j=-50; j<=50; ++j)
@@ -373,17 +346,13 @@ int main(int argc, char*argv[])
                     }
                 }
             }
-     
-
-          
-            
-            
+  
             //geometry for the olaf
             
             glEnableVertexAttribArray(0);
             glBindVertexArray(vertexArrayObjects[3]);
             
-
+   
             
             glFrontFace(GL_CW);
 
@@ -391,8 +360,7 @@ int main(int argc, char*argv[])
             mat4 WorldView_Olaf =  translateOlaf  * rotateOlaf * scaleOlaf;
 
             //get the mvp of the olaf and the olaf uniform color variable so we can use it to make eyes, buttons, gloves, nose, scarf.
-//            GLuint modelViewProjection_Olaf = glGetUniformLocation(nonTexturedShader, "mvp");
-//            GLuint olaf_Color = glGetUniformLocation(nonTexturedShader, "olaf_color");
+
             GLuint modelViewProjection_Olaf = glGetUniformLocation(textureShader, "mvp");
             GLuint olaf_Color = glGetUniformLocation(textureShader, "color");
              
@@ -400,7 +368,6 @@ int main(int argc, char*argv[])
             mat4 olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(0.f, 3.5f, 0.f))* scale(mat4(1.0f), vec3(1.3f, 1.3f, 1.3f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform3f(olaf_Color, 1.0f,1.0f,1.0f);
-            
             glDrawArrays(primativeRender1, 0, numOfVerticesSphere);
             
             //upper body
@@ -446,19 +413,15 @@ int main(int argc, char*argv[])
            glUniform3f(olaf_Color, 0.39f,0.26f,0.13f);
             glDrawArrays(primativeRender, 0, 36);
             
-          glFrontFace(GL_CCW);
+            glFrontFace(GL_CCW);
              glUniform1ui(glGetUniformLocation(textureShader, "withText"), 1);
+            
+            
             //nose
             if (!textureOn) {
-            
-           
-                    glUniform3f(viewPositionTexture, cameraPosition.x,cameraPosition.y,cameraPosition.z);
-            GLuint modelViewProjection_Olaf_Texture = glGetUniformLocation(textureShader, "mvp");
-                
-            
-            
+
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.896f, 5.9f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.35f, -0.1f));
-            glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform3f(olaf_Color, 1.0f,0.64f,0.0f);
             glDrawArrays(primativeRender, 0, 36);
             }
@@ -467,19 +430,8 @@ int main(int argc, char*argv[])
             //nose textured
             
             if(textureOn) {
-           glUniform1ui(glGetUniformLocation(textureShader, "withText"), 1);
-
-                    glUniform3f(viewPositionTexture, cameraPosition.x,cameraPosition.y,cameraPosition.z);
-            glActiveTexture(GL_TEXTURE0);
-            GLuint textureLocation = glGetUniformLocation(textureShader, "textureSampler");
-            glBindTexture(GL_TEXTURE_2D, carrotTextureID);
-            glUniform1i(textureLocation, 0);
-            GLuint modelViewProjection_Olaf_Texture = glGetUniformLocation(textureShader, "mvp");
-        
-            
-            
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.896f, 5.9f, 0.0f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.35f, -0.1f));
-            glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glBindTexture(GL_TEXTURE_2D, carrotTextureID);
             glDrawArrays(primativeRender, 0, 36);
             }
@@ -490,6 +442,7 @@ int main(int argc, char*argv[])
                        
              glFrontFace(GL_CW);
             //left eye
+            
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.696f, 6.05f, -0.2f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(-0.09f, 0.01f, -0.1f));
             glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform3f(olaf_Color, 0.0f,0.0f,0.0f);
@@ -564,47 +517,81 @@ int main(int argc, char*argv[])
             glFrontFace(GL_CCW);
             glUniform1ui(glGetUniformLocation(textureShader, "withText"), 1);
             //hat brim
+           
             if(!textureOn) {
-            glUniform3f(viewPositionTexture, cameraPosition.x,cameraPosition.y,cameraPosition.z);
-            GLuint modelViewProjection_Olaf_Texture = glGetUniformLocation(textureShader, "mvp");
-
-                
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.50f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.1f, 1.2f, 1.75f));
-            glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform3f(olaf_Color, 0.0f,0.0f,0.0f);
             glDrawArrays(primativeRender, 0, 36);
 
             //hat top
-            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.70f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.7f, 1.2f, 1.4f));
-            glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
+            olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.8f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.7f, 1.2f, 1.4f));
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glUniform3f(olaf_Color, 0.0f,0.0f,0.0f);
             glDrawArrays(primativeRender, 0, 36);
             }
             
             //texture hat brim
             if (textureOn) {
-            glUniform3f(viewPositionTexture, cameraPosition.x,cameraPosition.y,cameraPosition.z);
-            glActiveTexture(GL_TEXTURE0);
-            GLuint textureLocation = glGetUniformLocation(textureShader, "textureSampler");
+
+
             glBindTexture(GL_TEXTURE_2D, shinyMetalTextureID);
-            glUniform1i(textureLocation, 0);
-            GLuint modelViewProjection_Olaf_Texture = glGetUniformLocation(textureShader, "mvp");
-                       
-            
+
+
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.50f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.1f, 1.2f, 1.75f));
-            glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glBindTexture(GL_TEXTURE_2D, shinyMetalTextureID);
             glDrawArrays(primativeRender, 0, 36);
                        
             //textured hat top
             olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 6.8f, 0.f)) * rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 6.0f)) * scale(mat4(1.0f), vec3(0.7f, 1.2f, 1.4f));
-            glUniformMatrix4fv(modelViewProjection_Olaf_Texture, 1, GL_FALSE, &olaf_Body[0][0]);
+            glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
             glBindTexture(GL_TEXTURE_2D, shinyMetalTextureID);
             glDrawArrays(primativeRender, 0, 36);
             
             }
               glUniform1ui(glGetUniformLocation(textureShader, "withText"), 0);
 
+            
+            //geometry for the XYZ coord
+                            
+                                glEnableVertexAttribArray(0);
+                                glBindVertexArray(vertexArrayObjects[1]);
+                                glUseProgram(XYZ_Shader);
+                                      
+                                //get the MVP of the XYZ from the shader, get the color uniform variable so we can set each line to its own color
+                                GLuint modelViewProjection_XYZ = glGetUniformLocation(XYZ_Shader, "mvp");
+                                GLuint XYZ_color = glGetUniformLocation(XYZ_Shader, "xyz_color");
+                                //create the MVP of the camera to be placed within the world
+                                mat4 camera_ModelViewProject_XYZ =  projectionMatrix * viewMatrix * modelMatrix;
+                                glUniformMatrix4fv(modelViewProjection_XYZ, 1, GL_FALSE, &camera_ModelViewProject_XYZ[0][0]);
+
+                                //quick for loop to draw the 3 lines, and takes its colors from the XYZ colors array which is stored in the vertices header
+                                int XYZ_vertexIndex =0;
+                                for(int i =0; i<3;i++) {
+                                    glUniform3f(XYZ_color, XYZ_Colors[i].x,XYZ_Colors[i].y,XYZ_Colors[i].z);
+                                    glDrawArrays(GL_LINES, XYZ_vertexIndex, 2);
+                                    XYZ_vertexIndex = XYZ_vertexIndex +2;
+                                          }
+
+                                //lamp (light source)
+                                glEnableVertexAttribArray(0);
+                                glBindVertexArray(vertexArrayObjects[4]);
+                                glUseProgram(lamp_Shader);
+                                
+                                mat4 WorldView_lamp = projectionMatrix * viewMatrix * modelMatrix * translate(mat4(1.0f),lightpos) * scale(mat4(1.0f),vec3(3.0f,3.0f,3.0f));
+                                GLuint lampshader_MVP = glGetUniformLocation(lamp_Shader, "mvp");
+                                glUniformMatrix4fv(lampshader_MVP, 1, GL_FALSE, &WorldView_lamp[0][0]);
+                                glDrawArrays(primativeRender, 0, 36);
+                      
+                      
+                    
+            
+            
+            
+            
+            
+            
 
             // End Frame
             glfwSwapBuffers(window);
