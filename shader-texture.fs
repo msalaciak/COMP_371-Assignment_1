@@ -61,6 +61,35 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     return shadow;
 }
 
+float shadowCalculationNoTexture(vec4 fragPosLightSpace)
+{
+    // perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    
+    //bias for shadow acne using PCF
+    float bias = 0.006;
+
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    for(int x = -1; x <= 1; ++x)
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;
+        }
+    }
+    shadow /= 12.0;
+
+    return shadow;
+}
+
 
 
 void main()
@@ -68,6 +97,7 @@ void main()
     vec3 ambient;
     vec3 result;
     float shadow = ShadowCalculation(FragPosLightSpace);
+    float shadowNoText = shadowCalculationNoTexture(FragPosLightSpace);
     if(shadowsOn) {
         if(textureOn) {
             float shininess = 64.0f;
@@ -136,7 +166,7 @@ void main()
                 float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
                 vec3 specular = specularStrength * spec * lightColor;
                 
-                vec3 result =  (ambient  + diffuse + specular) * color  * (1.0 - shadow) ;
+                vec3 result =  (ambient  + diffuse + specular) * color  * (1.0 - shadowNoText) ;
 
                 FragColor = vec4(result,1.0f);
                 

@@ -482,6 +482,11 @@ int main(int argc, char*argv[])
                 {
                   float xTrans = -0.1;
                   xTrans = xTrans + 0.001f;
+                    legMoving +=0.1;
+                    float theta = cos(legMoving);
+                    theta = theta*4;
+                    cout<<theta<<endl;
+                    legMove = rotate(mat4(1.0f), radians(theta),vec3(0.0f,0.0f, -0.1f));
                   translateOlaf = translateOlaf * translate(mat4(1.0f), vec3(xTrans, 0.0f, 0.0f));
                 }
               
@@ -489,6 +494,11 @@ int main(int argc, char*argv[])
                 {
                   float xTrans = 0.1;
                   xTrans = xTrans + 0.001f;
+                    legMoving -=0.1;
+                                                        float theta = cos(legMoving);
+                                                        theta = theta*4;
+                                                        cout<<theta<<endl;
+                                                        legMove = rotate(mat4(1.0f), radians(theta),vec3(0.0f,0.0f, -0.1f));
                   translateOlaf = translateOlaf * translate(mat4(1.0f), vec3(xTrans,0.0f, 0.0f));
                 }
               
@@ -496,6 +506,11 @@ int main(int argc, char*argv[])
                 {
                   float zTrans = 0.1;
                   zTrans = zTrans + 0.001f;
+                    legMoving -=0.1;
+                                       float theta = cos(legMoving);
+                                       theta = theta*4;
+                                       cout<<theta<<endl;
+                                       legMove = rotate(mat4(1.0f), radians(theta),vec3(0.0f,0.0f, -0.1f));
                   translateOlaf = translateOlaf * translate(mat4(1.0f), vec3(0.0f,0.0f, zTrans));
                 }
               
@@ -504,8 +519,11 @@ int main(int argc, char*argv[])
                   float zTrans = -0.1;
                   zTrans = zTrans + 0.001f;
                     
-
-
+                    legMoving +=0.1;
+                    float theta = cos(legMoving);
+                    theta = theta*4;
+                    cout<<theta<<endl;
+                    legMove = rotate(mat4(1.0f), radians(theta),vec3(0.0f,0.0f, -0.1f));
                     translateOlaf = translateOlaf * translate(mat4(1.0f), vec3(0.0f,0.0f, zTrans));
                  
 
@@ -702,7 +720,7 @@ int main(int argc, char*argv[])
         return 0;
     }
 
-
+ 
     
      void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
      {
@@ -719,6 +737,18 @@ int main(int argc, char*argv[])
          if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) // turn right
                                           
              rotateOlaf = rotateOlaf * rotate(mat4(1.0f), radians(-90.0f),vec3(0.0f,-1.f, 0.f));
+         
+         if (key == GLFW_KEY_W && action == GLFW_RELEASE)
+                     legMove =mat4(1.0f);
+         
+         if (key == GLFW_KEY_A && action == GLFW_RELEASE)
+         legMove =mat4(1.0f);
+         
+         if (key == GLFW_KEY_S && action == GLFW_RELEASE)
+         legMove =mat4(1.0f);
+         
+         if (key == GLFW_KEY_D && action == GLFW_RELEASE)
+         legMove =mat4(1.0f);
                                             
          
      }
@@ -884,7 +914,7 @@ void renderLight(const GLuint &lamp_Shader)
                
     
                 //right leg
-                olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 1.3f, -0.5f)) * scale(mat4(1.0f), vec3(1.0f, 2.5f, -0.4f));
+                olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 1.3f, -0.5f)) * inverse(legMove) *scale(mat4(1.0f), vec3(1.0f, 2.5f, -0.4f));
                 glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
                 glUniform3f(olaf_Color, 1.0f,1.0f,1.0f);
                 glDrawArrays(primativeRender, 0, 36);
@@ -897,13 +927,13 @@ void renderLight(const GLuint &lamp_Shader)
     
     
                 //left arm
-                olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 4.7f, 1.50f)) * rotate(mat4(1.0f), radians(90.0f), vec3(6.0f, 0.0f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 1.8f, -0.2f));
+                olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 4.7f, 1.50f)) * legMove * rotate(mat4(1.0f), radians(90.0f), vec3(6.0f, 0.0f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 1.8f, -0.2f));
                 glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
                glUniform3f(olaf_Color, 0.39f,0.26f,0.13f);
                 glDrawArrays(primativeRender, 0, 36);
     
                 //right arm
-                olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 4.7f, -1.50f)) * rotate(mat4(1.0f), radians(90.0f), vec3(6.0f, 0.0f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 1.8f, -0.2f));
+                olaf_Body = WorldView_Olaf * translate(mat4(1.0f), vec3(-0.0f, 4.7f, -1.50f)) * inverse(legMove) * rotate(mat4(1.0f), radians(90.0f), vec3(6.0f, 0.0f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 1.8f, -0.2f));
                 glUniformMatrix4fv(modelViewProjection_Olaf, 1, GL_FALSE, &olaf_Body[0][0]);
                glUniform3f(olaf_Color, 0.39f,0.26f,0.13f);
                 glDrawArrays(primativeRender, 0, 36);
