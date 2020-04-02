@@ -138,7 +138,7 @@ int main(int argc, char*argv[])
         #endif
 
       
-     // the following functions loads the shaders to be used ****IMPORTANT***** PLEASE UPDATE FILE PATHS WHEN RUNNING CODE
+     // the following functions loads the shaders to be used 
 
 
     // basic shaders to draw the xyz axis and lamp object
