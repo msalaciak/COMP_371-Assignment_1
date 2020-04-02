@@ -126,7 +126,7 @@ int main(int argc, char*argv[])
         return -1;
     }
     
-            // Load Textures
+            // Load Textures ****IMPORTANT***** PLEASE UPDATE FILE PATHS WHEN RUNNING CODE
         #if defined(PLATFORM_OSX)
             snowTextureID = loadTexture("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Xcode/Textures/snowtexture3.jpg");
             carrotTextureID = loadTexture("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Xcode/Textures/carrot.jpg");
@@ -138,7 +138,7 @@ int main(int argc, char*argv[])
         #endif
 
       
-     // the following functions loads the shaders to be used
+     // the following functions loads the shaders to be used ****IMPORTANT***** PLEASE UPDATE FILE PATHS WHEN RUNNING CODE
 
 
     // basic shaders to draw the xyz axis and lamp object
