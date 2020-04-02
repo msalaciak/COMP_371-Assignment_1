@@ -1,12 +1,13 @@
-//
-// COMP 371 Assignment 1
-//
+//  A2_29644490
+// COMP 371 Assignment 2
 // Created by Matthew Salaciak 29644490.
 //
-// Inspired by the COMP 371 Lectures and Lab 2,3 and 4 and the following tutorials:
+// Inspired by the COMP 371 Lectures and Lab 2,3 and 4,6,8 and the following tutorials:
 // - https://learnopengl.com/Getting-started/Hello-Triangle
 // - https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL (for shader class)
 // - http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
+// - https://learnopengl.com/Lighting/Basic-Lighting-
+// - https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
 
 
 #include <iostream>
@@ -106,7 +107,7 @@ int main(int argc, char*argv[])
 
     
     // Create Window and rendering context using GLFW, resolution is 1024x768
-    GLFWwindow* window = glfwCreateWindow(1024, 768, "A1_29644490", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1024, 768, "A2_29644490", NULL, NULL);
     if (window == NULL)
     {
         std::cerr << "Failed to create GLFW window" << std::endl;
@@ -116,7 +117,6 @@ int main(int argc, char*argv[])
     
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwMakeContextCurrent(window);
-//    glViewport(0, 0, 1024, 768);
     glfwSetKeyCallback(window, key_callback);
 
     glewExperimental = true; // Needed for core profile
@@ -138,10 +138,10 @@ int main(int argc, char*argv[])
         #endif
 
       
-     // the following functions loads the shaders for nontexture, xyz axis and lamp (lightsource)
+     // the following functions loads the shaders to be used
 
 
-    
+    // basic shaders to draw the xyz axis and lamp object
     GLuint XYZ_Shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/xyz-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/xyz-shader.fs");
     
     GLuint lamp_Shader = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/lampShader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/lampShader.fs");
@@ -156,8 +156,8 @@ int main(int argc, char*argv[])
     GLuint simpleShadow = Shader("/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/simple-shadow-shader.vs", "/Users/matthew/Documents/school/WINTER 2020/COMP 371/assignments/A1_29644490/Assignment1_Framework/Source/simple-shadow-shader.fs");
 
     
-        // Define and upload geometry to the GPU here by creating a VAO and VBO that has the size of 3
-        // This way we can store of the geometry of all three objects at different indices.
+        // Define and upload geometry to the GPU here by creating a VAO and VBO that has the size of 5
+        // This way we can store of the geometry of all 5 objects at different indices.
     
         glGenVertexArrays(6, vertexArrayObjects);
         glGenBuffers(6, vertexBufferObjects);
@@ -260,6 +260,7 @@ int main(int argc, char*argv[])
         unsigned int depthMapFBO;
         glGenFramebuffers(1, &depthMapFBO);
         // create depth texture
+        // this part is largely inspired from the learnopengl tutorials and lab 8
 
         glGenTextures(1, &depthMap);
         glBindTexture(GL_TEXTURE_2D, depthMap);
@@ -270,7 +271,6 @@ int main(int argc, char*argv[])
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
         float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
         glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-        // attach depth texture as FBO's depth buffer
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
         glDrawBuffer(GL_NONE);
@@ -281,7 +281,7 @@ int main(int argc, char*argv[])
     
     
     
-    //textures
+    //setting texture id's
             glUseProgram(textureShader);
             glUniform1i(glGetUniformLocation(textureShader, "textureSampler"), 0);
             glUniform1i(glGetUniformLocation(textureShader, "shadowMap"), 1);
@@ -338,7 +338,7 @@ int main(int argc, char*argv[])
             GLuint lightColor = glGetUniformLocation(textureShader, "lightColor");
             glUniform3f(lightColor, 1.0f,1.0f,1.0f);
 
-            
+            //if shadows are enabled, this will calculate and render the shadows
             if (shadowsOn) {
             mat4 lightProjection, lightView , lightSpaceMatrix;
 
@@ -347,11 +347,11 @@ int main(int argc, char*argv[])
             glClear(GL_DEPTH_BUFFER_BIT);
 
 
-            // 1. render depth of scene to texture (from light's perspective)
-              // --------------------------------------------------------------
+             //this part is largely inspired by learnopengl's shadow tutorial and lab 8
+            //render shadows from lights perspective
               float near_plane = 1.0f, far_plane = 100.0f;
 
-              // note that if you use a perspective projection matrix you'll have to change the light position as the current light position isn't enough to reflect the whole scene
+    
               lightProjection = glm::perspective(glm::radians(130.0f), (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT, near_plane, far_plane);
               
 
@@ -373,6 +373,7 @@ int main(int argc, char*argv[])
               glViewport(0, 0, 1024, 768);
               glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+               //use textureshader to render the scene, and set the  boolean in the fragment shader to render wit shadows, if shadows aren't enabled then do it without
             glUseProgram(textureShader);
             glUniform1ui(glGetUniformLocation(textureShader, "shadowsOn"), 1);
             GLuint lightSpaceMatrixShader = glGetUniformLocation(textureShader, "lightSpaceMatrix");
@@ -386,9 +387,9 @@ int main(int argc, char*argv[])
             renderScene(textureShader);
             
             
-          
+            //these are rendered outside the side since they do not have shadows or lighting applied to them.
             renderLight(lamp_Shader);
-              renderXYZ(XYZ_Shader);
+            renderXYZ(XYZ_Shader);
             
             
                       
@@ -482,7 +483,7 @@ int main(int argc, char*argv[])
            
          
             
-            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) // move olaf to the left
+            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) // move olaf to the left, which moves arms, gloves and legs
                 {
                     float xTrans = -0.1;
                     xTrans = xTrans + 0.001f;
@@ -496,14 +497,14 @@ int main(int argc, char*argv[])
                     float thetaArm = cos(armMoving);
                     thetaArm = thetaArm*4;
                     float thetaGlove = cos(gloveMoving);
-thetaGlove = thetaGlove*.08;
+                    thetaGlove = thetaGlove*.08;
                     legMove = rotate(mat4(1.0f), radians(theta),vec3(0.0f,0.0f, -0.1f));
                     armMove = rotate(mat4(1.0f), radians(thetaArm),vec3(1.0f,0.0f, 0.0f));
                     translateOlaf = translateOlaf * translate(mat4(1.0f), vec3(xTrans, 0.0f, 0.0f));
                     gloveMove = translate(mat4(1.0f), vec3(0.0f, thetaGlove, 0.0f));
                 }
               
-            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // move olaf to the right
+            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // move olaf to the right, which moves arms, gloves and legs
                 {
                     float xTrans = 0.1;
                     xTrans = xTrans + 0.001f;
@@ -524,7 +525,7 @@ thetaGlove = thetaGlove*.08;
                     gloveMove = translate(mat4(1.0f), vec3(0.0f, thetaGlove, 0.0f));
                 }
               
-            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // move olaf up
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // move olaf up, which moves arms, gloves and legs
                 {
                     float zTrans = 0.1;
                     zTrans = zTrans + 0.001f;
@@ -545,7 +546,7 @@ thetaGlove = thetaGlove*.08;
                     gloveMove = translate(mat4(1.0f), vec3(0.0f, thetaGlove, 0.0f));
                 }
               
-            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // move olaf down
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // move olaf down, which moves arms, gloves and legs
                 {
                     float zTrans = -0.1;
                     zTrans = zTrans + 0.001f;
@@ -761,12 +762,14 @@ thetaGlove = thetaGlove*.08;
     }
 
  
-    
+    //i used key_callback method here because doing interactions in the main loop for toggling on and off shadows and texture was limiting.
      void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
      {
+         //turn off or on textures
          if (key == GLFW_KEY_X && action == GLFW_PRESS)
              textureOn = !textureOn;
          
+         //turn off or on shadows
          if (key == GLFW_KEY_B && action == GLFW_PRESS)
                      shadowsOn = !shadowsOn;
          
@@ -778,6 +781,8 @@ thetaGlove = thetaGlove*.08;
                                           
              rotateOlaf = rotateOlaf * rotate(mat4(1.0f), radians(-90.0f),vec3(0.0f,-1.f, 0.f));
          
+         // the following interaction commmands reset the arms, legs and gloves position of the olaf when the ASDW keys are released
+         //this way when the olaf stops moving it will resume its resting position
          if (key == GLFW_KEY_W && action == GLFW_RELEASE)
          {  legMove =mat4(1.0f);
              armMove = mat4(1.0f);
@@ -805,6 +810,8 @@ thetaGlove = thetaGlove*.08;
          
      }
    
+
+//this method renders the entire scene
 void renderScene(const GLuint &textureShader)
 {
             glActiveTexture(GL_TEXTURE0);
@@ -824,7 +831,7 @@ void renderScene(const GLuint &textureShader)
 
 
 
-    
+    //this renders the XYZ axis
 void renderXYZ(const GLuint &XYZ_Shader)
 
 {
@@ -849,6 +856,7 @@ void renderXYZ(const GLuint &XYZ_Shader)
 //
 }
 
+//renders the lamp
 void renderLight(const GLuint &lamp_Shader)
 {
     //lamp (light source)
@@ -863,7 +871,7 @@ void renderLight(const GLuint &lamp_Shader)
       glBindVertexArray(0);
 }
 
-    
+    //renders the grid
     void renderGrid(const GLuint &shader_grid)
 {
     
@@ -919,17 +927,17 @@ void renderLight(const GLuint &lamp_Shader)
     
 }
 
-    
+    //renders the olaf
     void renderOlaf(const GLuint &shader_olaf)
 
 {
-    //            //geometry for the olaf
+               //geometry for the olaf
     
                 glEnableVertexAttribArray(0);
                 glBindVertexArray(vertexArrayObjects[3]);
     
                 glActiveTexture(GL_TEXTURE0);
-//
+
                 glUniform1ui(glGetUniformLocation(shader_olaf, "withText"), 0);
                 glFrontFace(GL_CW);
     

@@ -1,3 +1,7 @@
+//  A2_29644490
+// COMP 371 Assignment 2
+// Created by Matthew Salaciak 29644490.
+
 #version 330 core
 layout (location = 0) in vec3 aPos;
 

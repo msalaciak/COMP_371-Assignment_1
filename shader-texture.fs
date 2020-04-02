@@ -1,7 +1,6 @@
-//  A1_29644490
-// COMP 371 Assignment 1
+//  A2_29644490
+// COMP 371 Assignment 2
 // Created by Matthew Salaciak 29644490.
-
 
 
 #version 330 core
@@ -32,15 +31,17 @@ uniform vec3 lightColor;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 
+//this is based from learnopengl's shadow tutorial and also lab 8
+// I also added PCF to make the shadows look more realistic and fix the bias error.
 float ShadowCalculation(vec4 fragPosLightSpace)
 {
-    // perform perspective divide
+
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    // transform to [0,1] range
+
     projCoords = projCoords * 0.5 + 0.5;
-    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+
     float closestDepth = texture(shadowMap, projCoords.xy).r;
-    // get depth of current fragment from light's perspective
+  
     float currentDepth = projCoords.z;
     
     //bias for shadow acne using PCF
@@ -61,15 +62,16 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     return shadow;
 }
 
+//when shadows were being rendered when no textures were applied, i wanted to change the bias and PCF sample size so it can make the shadows more darker
+//which make it more realistic on the grid when no snow texture is applied to the grid.
 float shadowCalculationNoTexture(vec4 fragPosLightSpace)
 {
-    // perform perspective divide
+
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    // transform to [0,1] range
+
     projCoords = projCoords * 0.5 + 0.5;
-    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
     float closestDepth = texture(shadowMap, projCoords.xy).r;
-    // get depth of current fragment from light's perspective
+
     float currentDepth = projCoords.z;
     
     //bias for shadow acne using PCF
@@ -91,7 +93,8 @@ float shadowCalculationNoTexture(vec4 fragPosLightSpace)
 }
 
 
-
+//if statements control how to render if there is texture or no texture, shadow or no shadow
+//lighting is phong model based from tutorials from learnopengl and lab 8
 void main()
 {
     vec3 ambient;

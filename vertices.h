@@ -1,11 +1,8 @@
 //
 //  vertices.h
-//  A1_29644490
-//
-// COMP 371 Assignment 1
-//
+//  A2_29644490
+// COMP 371 Assignment 2
 // Created by Matthew Salaciak 29644490.
-//
 
 #include <iostream>
 #include <list>
@@ -19,7 +16,7 @@
 using namespace glm;
 using namespace std;
 
-    unsigned int numOfVerticesGrid;
+unsigned int numOfVerticesGrid;
 
 struct grid
 {
@@ -130,62 +127,7 @@ struct snowman
 static const snowman snowman_vertices [] = {  // position,
 
     
-//      snowman(vec3 (-0.5f, -0.5f, 0.5f), vec3(0.0f, 0.0f, 1.0f), vec2(0.0f, 0.0f)),
-//      snowman(vec3 (0.5f, -0.5f, 0.5f),  vec3(0.0f, 0.0f, 1.0f), vec2(1.0f, 0.0f)),
-//      snowman(vec3 ( 0.5f, 0.5f, 0.5f), vec3( 0.0f, 0.0f, 1.0f), vec2(1.0f, 1.0f)),
-//
-//      snowman(vec3 (-0.5f, -0.5f, 0.5f), vec3(0.0f, 0.0f, 1.0f), vec2(0.0f, 0.0f)),
-//      snowman(vec3 ( 0.5f, 0.5f, 0.5f), vec3( 0.0f, 0.0f, 1.0f), vec2(1.0f, 1.0f)),
-//      snowman(vec3 ( -0.5f, 0.5f, 0.5f),  vec3(0.0f, 0.0f, 1.0f), vec2(0.0f, 1.0f)),
-//
-//      snowman(vec3 (0.5f, 0.5f, -0.5f), vec3( 1.0f, 0.0f, 0.0f), vec2(1.0f, 0.0f)),
-//      snowman(vec3 ( 0.5f, 0.5f, 0.5f),  vec3(1.0f, 0.0f, 0.0f), vec2(0.0f, 0.0f)),
-//      snowman(vec3 ( 0.5f, -0.5f, 0.5f),  vec3(1.0f, 0.0f, 0.0f), vec2(0.0f, 1.0f)),
-//
-//      snowman(vec3 (0.5f, 0.5f, -0.5f), vec3( 1.0f, 0.0f, 0.0f), vec2(1.0f, 0.0f)),
-//      snowman(vec3 ( 0.5f, -0.5f, 0.5f),  vec3(1.0f, 0.0f, 0.0f), vec2(0.0f, 1.0f)),
-//      snowman(vec3 (0.5f, -0.5f, -0.5f), vec3( 1.0f, 0.0f, 0.0f), vec2(1.0f, 1.0f)),
-//
-//
-//      snowman(vec3 ( -0.5f, -0.5f, 0.5f),  vec3(-1.0f, 0.0f, 0.0f), vec2(0.0f, 1.0f)),
-//      snowman(vec3 (-0.5f, 0.5f, 0.5f),  vec3(-1.0f, 0.0f, 0.0f),vec2( 0.0f, 0.0f)),
-//      snowman(vec3 (-0.5f, 0.5f, -0.5f), vec3( -1.0f, 0.0f, 0.0f),vec2( 1.0f, 0.0f)),
-//
-//
-//      snowman(vec3 ( -0.5f, -0.5f, 0.5f),  vec3(-1.0f, 0.0f, 0.0f), vec2(0.0f, 1.0f)),
-//    snowman(vec3 (-0.5f, 0.5f, -0.5f), vec3( -1.0f, 0.0f, 0.0f),vec2( 1.0f, 0.0f)),
-//       snowman(vec3 (-0.5f, -0.5f, -0.5f), vec3( -1.0f, 0.0f, 0.0f), vec2(1.0f, 1.0f)),
-//
-//      snowman(vec3 ( -0.5f, -0.5f, -0.5f), vec3(0.0f, 0.0f, -1.0f), vec2(0.0f, 0.0f)),
-//      snowman(vec3 ( -0.5f, 0.5f, -0.5f), vec3( 0.0f, 0.0f, -1.0f), vec2(0.0f, 1.0f)),
-//      snowman(vec3 ( 0.5f, 0.5f, -0.5f),  vec3(0.0f, 0.0f, -1.0f),vec2( 1.0f, 1.0f)),
-//
-//      snowman(vec3 ( -0.5f, -0.5f, -0.5f), vec3(0.0f, 0.0f, -1.0f), vec2(0.0f, 0.0f)),
-//      snowman(vec3 ( 0.5f, 0.5f, -0.5f),  vec3(0.0f, 0.0f, -1.0f),vec2( 1.0f, 1.0f)),
-//      snowman(vec3 ( 0.5f, -0.5f, -0.5f), vec3( 0.0f, 0.0f, -1.0f), vec2(1.0f, 0.0f)),
-//
-//
-//
-//      snowman(vec3 ( -0.5f, 0.5f, 0.5f),  vec3(0.0f, 1.0f, 0.0f),vec2( 0.0f, 0.0f)),
-//      snowman(vec3 ( 0.5f, 0.5f, 0.5f),  vec3(0.0f, 1.0f, 0.0f), vec2(1.0f, 0.0f)),
-//       snowman(vec3 (0.5f, 0.5f, -0.5f),  vec3(0.0f, 1.0f, 0.0f), vec2(1.0f, 1.0f)),
-//
-//
-//
-//      snowman(vec3 ( -0.5f, 0.5f, 0.5f),  vec3(0.0f, 1.0f, 0.0f),vec2( 0.0f, 0.0f)),
-//       snowman(vec3 (0.5f, 0.5f, -0.5f),  vec3(0.0f, 1.0f, 0.0f), vec2(1.0f, 1.0f)),
-//    snowman(vec3 ( -0.5f, 0.5f, -0.5f),  vec3(0.0f, 1.0f, 0.0f), vec2(0.0f, 1.0f)),
-//
-//
-//      snowman(vec3 ( -0.5f, -0.5f, -0.5f), vec3( 0.0f, -1.0f, 0.0f), vec2(0.0f, 1.0f)),
-//      snowman(vec3 ( 0.5f, -0.5f, -0.5f),  vec3(0.0f, -1.0f, 0.0f), vec2(1.0f, 1.0f)),
-//      snowman(vec3 ( 0.5f, -0.5f, 0.5f),  vec3(0.0f, -1.0f, 0.0f), vec2(1.0f, 0.0f)),
-//
-//
-//
-//      snowman(vec3 ( -0.5f, -0.5f, -0.5f), vec3( 0.0f, -1.0f, 0.0f), vec2(0.0f, 1.0f)),
-//      snowman(vec3 ( 0.5f, -0.5f, 0.5f),  vec3(0.0f, -1.0f, 0.0f), vec2(1.0f, 0.0f)),
-//      snowman(vec3 ( -0.5f, -0.5f, 0.5f), vec3( 0.0f, -1.0f, 0.0f), vec2(0.0f, 0.0f))
+
 
     
                snowman(vec3 ( -0.5f, -0.5f, -0.5f), vec3(0.0f,  0.0f, -1.0f), vec2( 0.0f, 0.0f)), // bottom-left
